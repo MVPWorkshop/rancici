@@ -1,4 +1,3 @@
-import { connect, disconnect } from 'starknetkit'
 import {
     BurnerAccount,
     BurnerManager,
