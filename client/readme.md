@@ -2,8 +2,10 @@
 ### Requirements
 - pnpm
 - node 18
+- torii running
+- katana running
 
-### Run in local
+### Configuration
 ```sh
 // Copy configuration example
 cp env.example .env
