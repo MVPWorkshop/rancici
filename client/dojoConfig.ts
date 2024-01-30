@@ -1,5 +1,5 @@
 import { Account } from "starknet";
-import manifest from "../../dojo-starter/target/dev/manifest.json";
+import manifest from "../contracts/target/dev/manifest.json";
 
 const {
     VITE_PUBLIC_NODE_URL,
