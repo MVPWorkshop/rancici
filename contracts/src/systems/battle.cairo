@@ -3,20 +3,20 @@
 trait IBattle<TContractState> {
     fn createBattle(self: @TContractState);
     // fn createBattle(self: @TContractState, player: starknet::ContractAddress, items: dojo_starter::models::backpack::Items);
-    fn joinBattle(self: @TContractState, battleId: u32, opponent: starknet::ContractAddress);
+    fn joinBattle(self: @TContractState, battleId: u32);
     fn startBattle(self: @TContractState, battleId: u32,);
 }
 
 // dojo decorator
 #[dojo::contract]
-mod Battle {
+mod battle {
     use super::IBattle;
 
     use starknet::{ContractAddress, get_caller_address};
     use dojo_starter::models::{battle::{Battle}};
 
     // impl: implement functions specified in trait
-    #[abi(embed_v0)]
+    #[external(v0)]
     impl BattleImpl of IBattle<ContractState> {
         fn createBattle(self: @ContractState) {
             // Access the world dispatcher for reading.
@@ -36,7 +36,7 @@ mod Battle {
             );
         }
 
-        fn joinBattle(self: @ContractState, battleId: u32, opponent: ContractAddress) {
+        fn joinBattle(self: @ContractState, battleId: u32) {
             // Access the world dispatcher for reading.
             let world = self.world_dispatcher.read();
 
@@ -45,7 +45,7 @@ mod Battle {
 
             let mut battle = get!(world, battleId, Battle);
 
-            battle.player2 = opponent;
+            battle.player2 = player;
             set!(world, (battle));
         }
         
