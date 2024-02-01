@@ -4,6 +4,10 @@ use starknet::ContractAddress;
 struct Backpack {
     #[key]
     player: ContractAddress,
+    #[key]
+    rancicAddress: ContractAddress,
+    #[key]
+    rancicId: u256,
     items: Items
 }
 
