@@ -1,12 +1,9 @@
 mod systems {
-    mod actions;
     mod battle;
     mod rancicActions;
 }
 
 mod models {
-    mod moves;
-    mod position;
     mod battle;
     mod config;
     mod item;

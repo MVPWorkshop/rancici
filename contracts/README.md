@@ -1,44 +1,18 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/mark-dark.svg">
-  <img alt="Dojo logo" align="right" width="120" src=".github/mark-light.svg">
-</picture>
+# Contracts
 
-<a href="https://twitter.com/dojostarknet">
-<img src="https://img.shields.io/twitter/follow/dojostarknet?style=social"/>
-</a>
-<a href="https://github.com/dojoengine/dojo">
-<img src="https://img.shields.io/github/stars/dojoengine/dojo?style=social"/>
-</a>
 
-[![discord](https://img.shields.io/badge/join-dojo-green?logo=discord&logoColor=white)](https://discord.gg/PwDa2mKhR4)
-[![Telegram Chat][tg-badge]][tg-url]
+## Battle Commands
+```sh
+ # Authenticate battle contract (so everyone can call it)
+ sozo auth writer -v Battle 0x205b2d192248efe597a053110c62c4abaa6f637a00a084596045a592c75c2aa  --world 0x28f5999ae62fec17c09c52a800e244961dba05251f5aaf923afabd9c9804d1a
+ 
+ # Create battle
+ sozo execute 0x205b2d192248efe597a053110c62c4abaa6f637a00a084596045a592c75c2aa createBattle
 
-[tg-badge]: https://img.shields.io/endpoint?color=neon&logo=telegram&label=chat&style=flat-square&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fdojoengine
-[tg-url]: https://t.me/dojoengine
+ # Join battle with different accounts
+ sozo execute --account-address 0x5686a647a9cdd63ade617e0baf3b364856b813b508f03903eb58a7e622d5855 --private-key 0x33003003001800009900180300d206308b0070db00121318d17b5e6262150b --calldata 0  0x205b2d192248efe597a053110c62c4abaa6f637a00a084596045a592c75c2aa joinBattle
 
-# Dojo Starter: Official Guide
+ # Start Battle (only if 2 different accounts have joineds)
+ sozo execute 0x205b2d192248efe597a053110c62c4abaa6f637a00a084596045a592c75c2aa startBattle --calldata 0`
 
-The official Dojo Starter guide, the quickest and most streamlined way to get your Dojo Autonomous World up and running. This guide will assist you with the initial setup, from cloning the repository to deploying your world.
-
-Read the full tutorial [here](https://book.dojoengine.org/cairo/hello-dojo.html)
-
----
-
-## Contribution
-
-This starter project is a constant work in progress and contributions are greatly appreciated!
-
-1. **Report a Bug**
-
-    - If you think you have encountered a bug, and we should know about it, feel free to report it [here](https://github.com/dojoengine/dojo-starter/issues) and we will take care of it.
-
-2. **Request a Feature**
-
-    - You can also request for a feature [here](https://github.com/dojoengine/dojo-starter/issues), and if it's viable, it will be picked for development.
-
-3. **Create a Pull Request**
-    - It can't get better then this, your pull request will be appreciated by the community.
-
-For any other questions, feel free to reach out to us [here](https://dojoengine.org/contact).
-
-Happy coding!
+```
