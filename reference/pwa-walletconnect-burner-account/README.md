@@ -1,32 +1,15 @@
-## PWA Lens Protocol example app
+### PWA + Dojo.js + Argent Mobile example
 
-A boilerplate combining [Lens Protocol](https://www.lens.xyz/), [WalletConnect](https://walletconnect.com/), [Privy](https://www.privy.io/), and [ShadCN UI](https://ui.shadcn.com/)
+Site can be installed as a PWA, and via WalletConnect authorized by user's Argent Mobile wallet.
 
-![Lens PWA Screenshot](pwa-header.png)
+Then a burner account is created (using Dojo.js) from which transactions can be sent.
 
-## Getting started
+**Note:** Burner's master account will need to be moved to Dapp's backend.
 
-1. Clone repo
+### Resources
 
-```sh
-git clone git@github.com:dabit3/lens-pwa.git
-```
+PWA: https://github.com/dabit3/lens-pwa
 
-2. Install dependencies
+Wallet Connect: https://docs.walletconnect.com/web3modal
 
-```sh
-npm install # or yarn, etc..
-```
-
-3. Configure environment variables for WalletConnect
-
-```sh
-# rename .example.env.local to .env.local 
-NEXT_PUBLIC_WC_ID=
-```
-
-4. Run the app
-
-```sh
-npm run dev
-```
+Dojo.js: https://www.npmjs.com/package/@dojoengine/create-burner
