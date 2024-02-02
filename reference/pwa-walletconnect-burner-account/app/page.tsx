@@ -1,142 +1,116 @@
 "use client";
 import { useState } from "react";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useAccount } from "wagmi";
+import { disconnect } from "@wagmi/core";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import ReactMarkdown from "react-markdown";
+import * as dojoUtils from "../lib/utils";
 
-import {
-  Account,
-  CallData,
-  ec,
-  hash,
-  RpcProvider,
-  Contract,
-  stark,
-} from "starknet";
+const Home = () => {
+  const { open } = useWeb3Modal();
+  const { address: argentAddress } = useAccount();
 
-import { BurnerManager } from "../dojo-burner-account/@dojoengine/create-burner/dist";
-
-// import "dotenv/config";
-
-export const setup = async () => {
-  console.log({ XX: process.env.NEXT_PUBLIC_RPC_URL });
-  const rpcProvider = new RpcProvider({
-    nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
+  const [status, setStatus] = useState({
+    info: "",
+    errorPresent: false,
+    errorMsg: "",
+    burner: {
+      address: "",
+      pk: "",
+    },
   });
 
-  console.log({ rpcProvider });
-  const masterAddress = process.env.NEXT_PUBLIC_MASTER_ADDR;
-  const masterPK = process.env.NEXT_PUBLIC_MASTER_PK;
-  const masterAccount = new Account(rpcProvider, masterAddress, masterPK, "1");
-
-  const burnerAccClassHash = process.env.NEXT_PUBLIC_BURNER_ACC_CLASS_HASH;
-
-  const burnerManager = new BurnerManager({
-    masterAccount,
-    rpcProvider,
-    accountClassHash: burnerAccClassHash,
-  });
-
-  return burnerManager;
-};
-
-export const createBurner = async (burnerManager) => {
-  try {
-    await burnerManager.create();
-  } catch (e) {
-    console.log(`ERR: creating burner`);
-    console.log(e);
-  }
-
-  burnerManager.init();
-
-  await delay(5000);
-
-  const burnerAddr = burnerManager.account.address;
-  const burnerPK = burnerManager.account.signer.pk;
-
-  const burnerAccount = new Account(
-    burnerManager.masterAccount.provider,
-    burnerAddr,
-    burnerPK,
-    "1"
-  );
-
-  return burnerAccount;
-};
-
-export const sendEthFromAccount = async ({
-  senderAcc,
-  receipientAddr,
-  amount,
-}) => {
-  const ETH_ADDRESS =
-    "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
-
-  const { abi } = await senderAcc.provider.getClassAt(ETH_ADDRESS);
-
-  const ethContract = new Contract(abi, ETH_ADDRESS, senderAcc.provider);
-
-  ethContract.connect(senderAcc);
-
-  const populatedTx = ethContract.populate("transfer", [
-    receipientAddr,
-    amount,
-  ]);
-
-  const tx = await ethContract.transfer(populatedTx.calldata);
-
-  return tx;
-};
-
-export const delay = (delayInms) => {
-  return new Promise((resolve) => setTimeout(resolve, delayInms));
-};
-
-export default function Home() {
   const [burnerAccount, setBurnerAccount] = useState(null);
+
+  const [txHistory, setTxHistory] = useState([]);
+
+  const errorActive = (err) => {
+    if (err != null) {
+      setStatus({
+        ...status,
+        errorPresent: true,
+        errorMsg: JSON.stringify(err),
+      });
+      return true;
+    }
+    return false;
+  };
+
   return (
     <div>
-      Hello 321
-      <Button
-        onClick={async () => {
-          console.log({
-            MASTER_ADDR: process.env.NEXT_PUBLIC_MASTER_ADDR,
-            NEXT_PUBLIC_PUBLIC_WC_ID: process.env.NEXT_PUBLIC_WC_ID,
-          });
-          console.log(`Setting up Burner Manager`);
-          const burnerManager = await setup();
-          console.log(`Creating Burner Account`);
-          const burnerAccount = await createBurner(burnerManager);
-          console.log(`All Good`);
-          console.log(`Burner Account:`);
-          console.log(`Addr:`, burnerAccount.address);
-          console.log(`PK:`, burnerAccount.signer.pk);
+      <div className="Status">
+        <h3>Status:</h3>
+        <pre>{JSON.stringify(status, null, 3)}</pre>
+      </div>
 
-          setBurnerAccount(burnerAccount);
-        }}
-      >
-        Create Burner
-      </Button>
-      <Button
-        onClick={async () => {
-          if (burnerAccount == null) {
-            console.log(`Burner account not set up`);
-            return;
-          }
-          const sendTx = await sendEthFromAccount({
-            senderAcc: burnerAccount,
-            receipientAddr: process.env.NEXT_PUBLIC_MASTER_ADDR,
-            amount: 100,
-          });
+      <div className="Control">
+        <h3>Control:</h3>
+        <div className="Buttons">
+          {!argentAddress && (
+            <button onClick={() => open()}>Connect Wallet</button>
+          )}
+          {argentAddress && <button onClick={disconnect}>Disconnect</button>}
+          <button
+            onClick={async () => {
+              setStatus({ ...status, info: `Setting up Burner Manager ...` });
+              const { res: burnerManager, err } = await dojoUtils.setup();
+              if (errorActive(err)) return;
 
-          console.log(`ETH sent:`, { sendTx });
-        }}
-      >
-        Send ETH from Burner
-      </Button>
+              setStatus({ ...status, info: `Creating Burner Account ...` });
+              const { res: burnerAccount, err: err2 } =
+                await dojoUtils.createBurner(burnerManager);
+              errorActive(err2); //TODO: public rpc problem ...
+
+              setStatus({
+                ...status,
+                info: `Burner Account created !!!`,
+                burner: {
+                  address: burnerAccount.address,
+                  pk: burnerAccount.signer.pk,
+                },
+              });
+              setBurnerAccount(burnerAccount);
+            }}
+          >
+            Create Burner
+          </button>
+          <button
+            onClick={async () => {
+              if (burnerAccount == null) {
+                setStatus({
+                  ...status,
+                  errorPresent: true,
+                  errorMsg: `Burner account not set up !!!`,
+                });
+                return;
+              }
+              const { res: sendTx, err } = await dojoUtils.sendEthFromAccount({
+                senderAcc: burnerAccount,
+                receipientAddr: process.env.NEXT_PUBLIC_MASTER_ADDR,
+                amount: 100,
+              });
+              if (errorActive(err)) return;
+
+              setStatus({
+                ...status,
+                info: `ETH sent !!!`,
+              });
+
+              setTxHistory([...txHistory, JSON.stringify(sendTx, null, 2)]);
+            }}
+          >
+            Send ETH from Burner
+          </button>
+        </div>
+      </div>
+
+      <div className="Transactions">
+        <h3>Transactions ({txHistory.length})</h3>
+        {txHistory.length != 0 &&
+          txHistory.map((tx, idx) => <div key={`tx=${idx}`}>{tx}</div>)}
+      </div>
     </div>
   );
-}
+};
+
+export default Home;
