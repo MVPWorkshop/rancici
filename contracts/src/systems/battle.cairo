@@ -5,6 +5,8 @@ trait IBattle<TContractState> {
     // fn createBattle(self: @TContractState, player: starknet::ContractAddress, items: dojo_starter::models::backpack::Items);
     fn joinBattle(self: @TContractState, battleId: u32);
     fn startBattle(self: @TContractState, battleId: u32,);
+    fn dummy(ref self: TContractState);
+    fn dummy2(ref self: TContractState);
 }
 
 // dojo decorator
@@ -15,8 +17,11 @@ mod battle {
     use starknet::{ContractAddress, get_caller_address};
     use dojo_starter::models::{battle::{Battle}, config::{BATTLE_COUNTER, BattleConfig}};
 
+    // #[external(v0)]
+    // fn dummy() {}
+
     // impl: implement functions specified in trait
-    #[external(v0)]
+    #[abi(embed_v0)]
     impl BattleImpl of IBattle<ContractState> {
         fn createBattle(self: @ContractState) {
             // Access the world dispatcher for reading.
@@ -68,5 +73,8 @@ mod battle {
             battle.started = true;
             set!(world, (battle));
         }
+
+        fn dummy(ref self: ContractState){}
+        fn dummy2(ref self: ContractState){}
     }
 }

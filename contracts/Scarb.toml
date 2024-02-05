@@ -1,5 +1,5 @@
 [package]
-cairo-version = "2.4.0"
+cairo-version = "2.3.0"
 name = "dojo_starter"
 version = "0.5.0"
 
@@ -12,13 +12,20 @@ dojo = { git = "https://github.com/dojoengine/dojo", version = "0.5.0" }
 [[target.dojo]]
 
 [tool.dojo]
-initializer_class_hash = "0xbeef"
+initializer_class_hash = "0xbeedead"
 
 [tool.dojo.env]
-rpc_url = "http://localhost:5050/"
-# Default account for katana with seed = 0
-account_address = "0x2d71e9c974539bb3ffb4b115e66a23d0f62a641ea66c4016e903454c8753bbc"
-private_key = "0x33003003001800009900180300d206308b0070db00121318d17b5e6262150b"
+#katana-local
+#rpc_url = "http://localhost:5050/"
+#account_address = "0x2d71e9c974539bb3ffb4b115e66a23d0f62a641ea66c4016e903454c8753bbc"
+#private_key = "0x33003003001800009900180300d206308b0070db00121318d17b5e6262150b"
+
+#testnet
+rpc_url="https://starknet-goerli.g.alchemy.com/v2/TueS0QhfyU7WJHpMsDdGYoxygW_5FJDi"
+account_address="0x061AE32828ddc87301A526dBc63f802884C784f41A31A8dF11EB3e86e9Cd7719"
+private_key="0x05383bb769eaef59e3fc09e6e86eb335ad1a403cd7d290c215894553bb163db0"
+
+world="0x4b8a05b3b265fba18d7442d521abd9d502e32684e4e6f3c15b56722e6d94103"
 
 [tool.dojo.world]
 name = "Dojo starter"
