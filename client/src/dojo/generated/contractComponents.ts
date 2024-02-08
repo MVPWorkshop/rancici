@@ -2,44 +2,64 @@
 
 import { defineComponent, Type as RecsType, World } from "@dojoengine/recs";
 
+
 export type ContractComponents = Awaited<
     ReturnType<typeof defineContractComponents>
 >;
 
 export function defineContractComponents(world: World) {
-    return {
-        Moves: (() => {
-            return defineComponent(
-                world,
-                {
-                    player: RecsType.BigInt,
-                    remaining: RecsType.Number,
-                    last_direction: RecsType.Number,
-                },
-                {
-                    metadata: {
-                        name: "Moves",
-                        types: ["contractaddress", "u8", "enum"],
-                        customTypes: ["Direction"],
-                    },
-                }
-            );
-        })(),
-        Position: (() => {
-            return defineComponent(
-                world,
-                {
-                    player: RecsType.BigInt,
-                    vec: { x: RecsType.Number, y: RecsType.Number },
-                },
-                {
-                    metadata: {
-                        name: "Position",
-                        types: ["contractaddress", "u32", "u32"],
-                        customTypes: ["Vec2"],
-                    },
-                }
-            );
-        })(),
-    };
+  return {
+	  Backpack: (() => {
+	    return defineComponent(
+	      world,
+	      { player: RecsType.BigInt, items: { first: RecsType.Number, second: RecsType.Number, third: RecsType.Number, fourth: RecsType.Number, fifth: RecsType.Number } },
+	      {
+	        metadata: {
+	          name: "Backpack",
+	          types: ["contractaddress","u32","u32","u32","u32","u32"],
+	          customTypes: ["Items"],
+	        },
+	      }
+	    );
+	  })(),
+	  Battle: (() => {
+	    return defineComponent(
+	      world,
+	      { id: RecsType.Number, player1: RecsType.BigInt, player2: RecsType.BigInt, started: RecsType.Boolean },
+	      {
+	        metadata: {
+	          name: "Battle",
+	          types: ["u32","contractaddress","contractaddress","bool"],
+	          customTypes: [],
+	        },
+	      }
+	    );
+	  })(),
+	  BattleConfig: (() => {
+	    return defineComponent(
+	      world,
+	      { entity_id: RecsType.BigInt, counter: RecsType.Number },
+	      {
+	        metadata: {
+	          name: "BattleConfig",
+	          types: ["felt252","u32"],
+	          customTypes: [],
+	        },
+	      }
+	    );
+	  })(),
+	  Item: (() => {
+	    return defineComponent(
+	      world,
+	      { id: RecsType.Number, damage: RecsType.Number, health: RecsType.Number, armor: RecsType.Number },
+	      {
+	        metadata: {
+	          name: "Item",
+	          types: ["u32","u32","u32","u32"],
+	          customTypes: [],
+	        },
+	      }
+	    );
+	  })(),
+  };
 }

@@ -1,19 +1,22 @@
 import { useComponentValue } from "@dojoengine/react";
-import { Entity } from "@dojoengine/recs";
+import { Entity , getComponentValue} from "@dojoengine/recs";
 import { useEffect, useState } from "react";
 import "./App.css";
-import { Direction } from "./utils";
 import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { useDojo } from "./dojo/useDojo";
+import { Account, BigNumberish, RpcProvider } from "starknet";
+import { CLIENT_RENEG_LIMIT } from "tls";
+
 
 function App() {
     const {
         setup: {
-            systemCalls: { spawn, move },
-            clientComponents: { Position, Moves },
+            systemCalls: { createBattle, joinBattle, startBattle },
+            clientComponents: { Backpack, Battle, BattleConfig, Item },
         },
         account,
-        masterAccount
+        masterAccount,
+        secondAccount
     } = useDojo();
 
     const [clipboardStatus, setClipboardStatus] = useState({
@@ -23,12 +26,13 @@ function App() {
 
     // entity id we are syncing
     const entityId = getEntityIdFromKeys([
-        BigInt(account?.account.address),
-    ]) as Entity;
+        BigInt(masterAccount.address),
+    ]) as Entity; 
 
+    console.log("Entity id: " + entityId);
     // get current component values
-    const position = useComponentValue(Position, entityId);
-    const moves = useComponentValue(Moves, entityId);
+    // const battleId = getComponentValue (Battle, entityId);
+    //  console.log("Battle id: " + battleId);
 
     const handleRestoreBurners = async () => {
         try {
@@ -99,52 +103,22 @@ function App() {
                 </div>
             </div>
 
-            <div className="card">
-                <button onClick={() => spawn(account.account)}>Spawn</button>
-                <div>
-                    Moves Left: {moves ? `${moves.remaining}` : "Need to Spawn"}
-                </div>
-                <div>
-                    Position:{" "}
-                    {position
-                        ? `${position.vec.x}, ${position.vec.y}`
-                        : "Need to Spawn"}
-                </div>
+            <div className="card"> 
+                <button onClick={() => createBattle(masterAccount)}>Create Battle</button>
             </div>
 
             <div className="card">
                 <div>
-                    <button
-                        onClick={() =>
-                            position && position.vec.y > 0
-                                ? move(account.account, Direction.Up)
-                                : console.log("Reach the borders of the world.")
-                        }
-                    >
-                        Move Up
+                    <button onClick={() => joinBattle(secondAccount, 0)}>
+                         Join Battle {secondAccount.address}
                     </button>
                 </div>
                 <div>
                     <button
-                        onClick={() =>
-                            position && position.vec.x > 0
-                                ? move(account.account, Direction.Left)
-                                : console.log("Reach the borders of the world.")
+                        onClick={() => startBattle(masterAccount, 0)
                         }
                     >
-                        Move Left
-                    </button>
-                    <button
-                        onClick={() => move(account.account, Direction.Right)}
-                    >
-                        Move Right
-                    </button>
-                </div>
-                <div>
-                    <button
-                        onClick={() => move(account.account, Direction.Down)}
-                    >
-                        Move Down
+                        START
                     </button>
                 </div>
             </div>

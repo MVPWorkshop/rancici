@@ -1,13 +1,5 @@
-import { Account } from "starknet";
-import { Entity, getComponentValue } from "@dojoengine/recs";
-import { uuid } from "@latticexyz/utils";
+import { Account, BigNumberish } from "starknet";
 import { ClientComponents } from "./createClientComponents";
-import { Direction, updatePositionWithDirection } from "../utils";
-import {
-    getEntityIdFromKeys,
-    getEvents,
-    setComponentsFromEvents,
-} from "@dojoengine/utils";
 import { ContractComponents } from "./generated/contractComponents";
 import type { IWorld } from "./generated/generated";
 
@@ -16,105 +8,55 @@ export type SystemCalls = ReturnType<typeof createSystemCalls>;
 export function createSystemCalls(
     { client }: { client: IWorld },
     contractComponents: ContractComponents,
-    { Position, Moves }: ClientComponents
+    { Backpack, Battle, BattleConfig, Item }: ClientComponents
 ) {
-    const spawn = async (account: Account) => {
-        const entityId = getEntityIdFromKeys([
-            BigInt(account.address),
-        ]) as Entity;
 
-        const positionId = uuid();
-        Position.addOverride(positionId, {
-            entity: entityId,
-            value: { player: BigInt(entityId), vec: { x: 10, y: 10 } },
-        });
-
-        const movesId = uuid();
-        Moves.addOverride(movesId, {
-            entity: entityId,
-            value: {
-                player: BigInt(entityId),
-                remaining: 100,
-                last_direction: 0,
-            },
-        });
-
+    const createBattle = async (account: Account) => {
         try {
-            const { transaction_hash } = await client.actions.spawn({
+            console.log("Account: "+ account);
+            await client.actions.createBattle({
                 account,
             });
 
-            setComponentsFromEvents(
-                contractComponents,
-                getEvents(
-                    await account.waitForTransaction(transaction_hash, {
-                        retryInterval: 100,
-                    })
-                )
-            );
+            console.log("createSystemCalls: create battle");
+            console.log("Caller" + account.address);
         } catch (e) {
             console.log(e);
-            Position.removeOverride(positionId);
-            Moves.removeOverride(movesId);
-        } finally {
-            Position.removeOverride(positionId);
-            Moves.removeOverride(movesId);
         }
-    };
+    }
 
-    const move = async (account: Account, direction: Direction) => {
-        const entityId = getEntityIdFromKeys([
-            BigInt(account.address),
-        ]) as Entity;
-
-        const positionId = uuid();
-        Position.addOverride(positionId, {
-            entity: entityId,
-            value: {
-                player: BigInt(entityId),
-                vec: updatePositionWithDirection(
-                    direction,
-                    getComponentValue(Position, entityId) as any
-                ).vec,
-            },
-        });
-
-        const movesId = uuid();
-        Moves.addOverride(movesId, {
-            entity: entityId,
-            value: {
-                player: BigInt(entityId),
-                remaining:
-                    (getComponentValue(Moves, entityId)?.remaining || 0) - 1,
-            },
-        });
-
+    const joinBattle = async (account: Account, battleId: BigNumberish) => {
         try {
-            const { transaction_hash } = await client.actions.move({
-                account,
-                direction,
+            await client.actions.joinBattle({
+                account, battleId
             });
 
-            setComponentsFromEvents(
-                contractComponents,
-                getEvents(
-                    await account.waitForTransaction(transaction_hash, {
-                        retryInterval: 100,
-                    })
-                )
-            );
+            console.log("createSystemCalls: join battle");
+            console.log("Caller" + account.address);
+
         } catch (e) {
             console.log(e);
-            Position.removeOverride(positionId);
-            Moves.removeOverride(movesId);
-        } finally {
-            Position.removeOverride(positionId);
-            Moves.removeOverride(movesId);
         }
-    };
+    }
+
+    const startBattle = async (account: Account, battleId: BigNumberish) => {
+        try {
+            await client.actions.startBattle({
+                account, battleId
+            });
+
+            console.log("createSystemCalls: start battle");
+            console.log("Caller" + account.address);
+
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
 
     return {
-        spawn,
-        move,
+        createBattle,
+        joinBattle,
+        startBattle,
     };
 }

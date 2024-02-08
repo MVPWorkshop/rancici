@@ -13,25 +13,25 @@ async function init() {
     if (!rootElement) throw new Error("React root not found");
     const root = ReactDOM.createRoot(rootElement as HTMLElement);
 
-    // Let the user pick a wallet (on button click)
-    const starknet = await connect()
+    // // Let the user pick a wallet (on button click)
+    // const starknet = await connect()
 
-    if (!starknet) {
-    throw Error("User rejected wallet selection or silent connect found nothing")
-    }
+    // if (!starknet) {
+    // throw Error("User rejected wallet selection or silent connect found nothing")
+    // }
 
-    starknet.wallet?.enable()
+    // starknet.wallet?.enable()
 
-    let account: Account | undefined = undefined;
-    // Check if connection was successful
-    if(starknet.wallet?.isConnected) {
-        account = await starknet.wallet.account;
-    }
+    // let account: Account | undefined = undefined;
+    // // Check if connection was successful
+    // if(starknet.wallet?.isConnected) {
+    //     account = await starknet.wallet.account;
+    // }
 
-    if(!account?.address) {
-        throw new Error("account not found")
-    }
-    const setupResult = await setup(dojoConfig(account));
+    // if(!account?.address) {
+    //     throw new Error("account not found")
+    // }
+    const setupResult = await setup(dojoConfig());
 
     root.render(
         <React.StrictMode>

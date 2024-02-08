@@ -13,7 +13,7 @@ mod battle {
     use super::IBattle;
 
     use starknet::{ContractAddress, get_caller_address};
-    use dojo_starter::models::{battle::{Battle}, config::{BATTLE_COUNTER, BattleConfig}};
+    use dojo_starter_battle::models::{battle::{Battle}, config::{BATTLE_COUNTER, BattleConfig}};
 
     // impl: implement functions specified in trait
     #[external(v0)]
@@ -68,5 +68,6 @@ mod battle {
             battle.started = true;
             set!(world, (battle));
         }
+        //treba li da return-ujes f-je?
     }
 }
