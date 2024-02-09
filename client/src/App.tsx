@@ -4,11 +4,27 @@ import { useEffect, useState } from "react";
 import { Direction } from "./utils";
 import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { useDojo } from "./dojo/useDojo";
+import GameUI from "./game-ui/GameUI";
 
 import "./style/App.css";
 
 const App = () => {
-  return <div>Hello</div>;
+  const config = {
+    width: 800,
+    height: 600,
+    type: Phaser.AUTO,
+    parent: "game-ui-root",
+    scene: GameUI,
+  };
+
+  const game = new Phaser.Game(config);
+
+  return (
+    <div className="App">
+      <h3>App</h3>
+      <div className="game-ui-root"></div>
+    </div>
+  );
 };
 
 const App2 = () => {
