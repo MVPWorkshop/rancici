@@ -7,6 +7,8 @@ const {
     VITE_PUBLIC_MASTER_ADDRESS,
     VITE_PUBLIC_MASTER_PRIVATE_KEY,
     VITE_PUBLIC_ACCOUNT_CLASS_HASH,
+    VITE_PUBLIC_SECOND_ACCOUNT_ADDRESS,
+    VITE_PUBLIC_SECOND_ACCOUNT_PRIVATE_KEY
 } = import.meta.env;
 
 export type Config = ReturnType<typeof dojoConfig>;
@@ -25,8 +27,8 @@ export function dojoConfig() {
 
     const secondAccount = new Account(
         rpcProvider,
-        "0x6162896d1d7ab204c7ccac6dd5f8e9e7c25ecd5ae4fcb4ad32e57786bb46e03",
-        "0x1800000000300000180000000000030000000000003006001800006600"
+        VITE_PUBLIC_SECOND_ACCOUNT_ADDRESS,
+        VITE_PUBLIC_SECOND_ACCOUNT_PRIVATE_KEY
     );
 
     return {

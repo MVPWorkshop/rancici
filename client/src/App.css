@@ -37,6 +37,23 @@
     padding: 2em;
 }
 
+.button-style {
+    background-color: lightgrey;
+    border: 2px solid darkgrey;
+}
+
+.text-style {
+    color: grey;
+    font-size: 12px;
+}
+
+.container {
+    width: 100%;
+    height: 100px;
+    padding-bottom: 15px;
+}
+
+
 .read-the-docs {
     color: #888;
 }

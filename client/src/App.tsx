@@ -1,11 +1,12 @@
-import { useComponentValue } from "@dojoengine/react";
-import { Entity , getComponentValue} from "@dojoengine/recs";
+import { Entity , getComponentValue, getComponentEntities} from "@dojoengine/recs";
 import { useEffect, useState } from "react";
 import "./App.css";
-import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { useDojo } from "./dojo/useDojo";
 import { Account, BigNumberish, RpcProvider } from "starknet";
 import { CLIENT_RENEG_LIMIT } from "tls";
+import BattleComponent from "./Battle";
+import { battleEventEmitter } from './dojo/createSystemCalls';
+import { useComponentValue } from "@latticexyz/react";
 
 
 function App() {
@@ -19,53 +20,88 @@ function App() {
         secondAccount
     } = useDojo();
 
-    const [clipboardStatus, setClipboardStatus] = useState({
-        message: "",
-        isError: false,
-    });
+    // const [clipboardStatus, setClipboardStatus] = useState({
+    //     message: "",
+    //     isError: false,
+    // });
 
-    // entity id we are syncing
-    const entityId = getEntityIdFromKeys([
-        BigInt(masterAccount.address),
-    ]) as Entity; 
+    const [battleId, setBattleId]= useState(-1);
 
-    console.log("Entity id: " + entityId);
-    // get current component values
-    // const battleId = getComponentValue (Battle, entityId);
-    //  console.log("Battle id: " + battleId);
-
-    const handleRestoreBurners = async () => {
-        try {
-            await account?.applyFromClipboard();
-            setClipboardStatus({
-                message: "Burners restored successfully!",
-                isError: false,
-            });
-        } catch (error) {
-            setClipboardStatus({
-                message: `Failed to restore burners from clipboard`,
-                isError: true,
-            });
-        }
-    };
+    const [battleEntities, setBattleEntities] = useState<any[]>(Array.from(getComponentEntities(Battle)));
 
     useEffect(() => {
-        if (clipboardStatus.message) {
-            const timer = setTimeout(() => {
-                setClipboardStatus({ message: "", isError: false });
-            }, 3000);
+        const handleNewBattleCreated = () => {
+            setBattleEntities(Array.from(getComponentEntities(Battle)));
+        };
 
-            return () => clearTimeout(timer);
-        }
-    }, [clipboardStatus.message]);
+        battleEventEmitter.on('newBattleCreated', handleNewBattleCreated);
+
+        return () => {
+            battleEventEmitter.off('newBattleCreated', handleNewBattleCreated);
+        };
+    }, []);
+
+    useEffect(() => {
+        const handleBattleUpdate= (updatedBattleId: Entity) => {
+            const updatedBattleEntity = getComponentValue(Battle, updatedBattleId);
+            if(updatedBattleEntity){
+                setBattleEntities(prevBattleEntities => {
+                    const existingIndex = prevBattleEntities.findIndex(entity => entity.id == updatedBattleEntity.id);
+                    if (existingIndex !== -1) {
+                        const updatedEntities = [...prevBattleEntities];
+                        updatedEntities[existingIndex] = updatedBattleEntity;
+                        console.log("if");
+                        return updatedEntities;
+                       
+                    } else {
+                        console.log("else");
+                        return [...prevBattleEntities, updatedBattleEntity];
+                    }
+                });
+            }
+        };
+    
+        battleEventEmitter.on('battleUpdated', handleBattleUpdate);
+
+        return () => {
+            battleEventEmitter.off('battleUpdated', handleBattleUpdate);
+        };
+    }, [battleEntities]);
+    
+
+    // const handleRestoreBurners = async () => {
+    //     try {
+    //         await account?.applyFromClipboard();
+    //         setClipboardStatus({
+    //             message: "Burners restored successfully!",
+    //             isError: false,
+    //         });
+    //     } catch (error) {
+    //         setClipboardStatus({
+    //             message: `Failed to restore burners from clipboard`,
+    //             isError: true,
+    //         });
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     if (clipboardStatus.message) {
+    //         const timer = setTimeout(() => {
+    //             setClipboardStatus({ message: "", isError: false });
+    //         }, 3000);
+
+    //         return () => clearTimeout(timer);
+    //     }
+    // }, [clipboardStatus.message]);
+
 
     return (
         <>
-            <div>
+            {/* <div>
                 <h2>{masterAccount.address}</h2>
                 <h2>{account.account.address}</h2>
-            </div>
-            <button onClick={account?.create}>
+            </div> */}
+            {/* <button onClick={account?.create}>
                 {account?.isDeploying ? "deploying burner" : "create burner"}
             </button>
             {account && account?.list().length > 0 && (
@@ -101,26 +137,35 @@ function App() {
                         Clear burners
                     </button>
                 </div>
-            </div>
+            </div> */}
 
-            <div className="card"> 
-                <button onClick={() => createBattle(masterAccount)}>Create Battle</button>
+            <div className="container">
+                <div className="card">
+                    <button onClick={() => createBattle(masterAccount)} className="button-style">Create Battle</button>
+                </div>
             </div>
-
-            <div className="card">
-                <div>
-                    <button onClick={() => joinBattle(secondAccount, 0)}>
-                         Join Battle {secondAccount.address}
-                    </button>
+            <div className="container">
+                <div className="card">
+                    <button onClick={() => joinBattle(secondAccount, battleId)} className="button-style">Join Battle</button>
+                    {battleId > -1 && (<p className="text-style">Chosen battle ID: {battleId}</p>)}
                 </div>
-                <div>
-                    <button
-                        onClick={() => startBattle(masterAccount, 0)
-                        }
-                    >
-                        START
-                    </button>
+            </div>
+            <div className="container">
+                <div className="card">
+                    <button onClick={() => startBattle(masterAccount, battleId)} className="button-style">START</button>
+                    {battleId > - 1 && (<p className="text-style">Chosen battle ID: {battleId}</p>)}
                 </div>
+            </div>
+            <div className="container">
+                {battleEntities.length > 0 && (
+                    <h3>Click on the battle you wish to join/start:</h3>
+                )}
+                {battleEntities.map(entity => {
+                    const val = getComponentValue(Battle, entity);
+                    return val ? (
+                        <BattleComponent key={Number(val.id)} battleId={val.id} joined={val.player1 !== val.player2} started={val.started} setBattleIdValue={setBattleId} />
+                    ) : <></>;
+                })}
             </div>
         </>
     );
