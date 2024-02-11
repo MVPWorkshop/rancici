@@ -5,18 +5,11 @@ import { Direction } from "./utils";
 import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { useDojo } from "./dojo/useDojo";
 import GameUI from "./game-ui/GameUI";
+import config from "./game-ui/Config";
 
 import "./style/App.css";
 
 const App = () => {
-  const config = {
-    width: 800,
-    height: 600,
-    type: Phaser.AUTO,
-    parent: "game-ui-root",
-    scene: GameUI,
-  };
-
   const game = new Phaser.Game(config);
 
   return (
