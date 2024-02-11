@@ -14,8 +14,8 @@ export const GRID_Y_LEN = 500;
 export const GRID_W = 7;
 export const GRID_H = 7;
 
-export const GRID_W_LEN = 60;
-export const GRID_H_LEN = 60;
+export const CELL_W_LEN = 60;
+export const CELL_H_LEN = 60;
 
 export const GRID_CELL_PADDING = 2;
 
