@@ -4,13 +4,10 @@ import * as localStorage from "../utils/localStorage.ts";
 const Login = ({ stateManager }) => {
   return (
     <div className="Login">
-      <h3>Login</h3>
-
-      {stateManager.state.loggedIn == false ? (
-        <button onClick={async () => connectWallet(stateManager)}>
-          Connect Wallet
-        </button>
-      ) : null}
+      <h3>Page:Login</h3>
+      <button onClick={async () => connectWallet(stateManager)}>
+        Connect Wallet
+      </button>
     </div>
   );
 };

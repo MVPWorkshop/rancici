@@ -14,7 +14,7 @@ const PreBattle = ({ stateManager }) => {
     <div className="PreBattle">
       <Navbar stateManager={stateManager}></Navbar>
 
-      <h3>PreBattle</h3>
+      <h3>Page: PreBattle</h3>
       <h3>Status: {stateManager.state.pageState.status}</h3>
       <button onClick={() => sendMove(stateManager, "full move info")}>
         Random move
