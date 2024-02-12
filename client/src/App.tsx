@@ -7,6 +7,11 @@ import { CLIENT_RENEG_LIMIT } from "tls";
 import BattleComponent from "./Battle";
 import { battleEventEmitter } from './dojo/createSystemCalls';
 import { useComponentValue } from "@latticexyz/react";
+import Board from "./components/Board";
+import { EmptyCell } from "./types";
+import AvailableBlocks from "./components/AvailableBlocks";
+import { useGameLogic } from "./hooks/useGameLogic";
+
 
 
 function App() {
@@ -20,153 +25,22 @@ function App() {
         secondAccount
     } = useDojo();
 
-    // const [clipboardStatus, setClipboardStatus] = useState({
-    //     message: "",
-    //     isError: false,
-    // });
-
-    const [battleId, setBattleId]= useState(-1);
-
-    const [battleEntities, setBattleEntities] = useState<any[]>(Array.from(getComponentEntities(Battle)));
-
-    useEffect(() => {
-        const handleNewBattleCreated = () => {
-            setBattleEntities(Array.from(getComponentEntities(Battle)));
-        };
-
-        battleEventEmitter.on('newBattleCreated', handleNewBattleCreated);
-
-        return () => {
-            battleEventEmitter.off('newBattleCreated', handleNewBattleCreated);
-        };
-    }, []);
-
-    useEffect(() => {
-        const handleBattleUpdate= (updatedBattleId: Entity) => {
-            const updatedBattleEntity = getComponentValue(Battle, updatedBattleId);
-            if(updatedBattleEntity){
-                setBattleEntities(prevBattleEntities => {
-                    const existingIndex = prevBattleEntities.findIndex(entity => entity.id == updatedBattleEntity.id);
-                    if (existingIndex !== -1) {
-                        const updatedEntities = [...prevBattleEntities];
-                        updatedEntities[existingIndex] = updatedBattleEntity;
-                        console.log("if");
-                        return updatedEntities;
-                       
-                    } else {
-                        console.log("else");
-                        return [...prevBattleEntities, updatedBattleEntity];
-                    }
-                });
-            }
-        };
-    
-        battleEventEmitter.on('battleUpdated', handleBattleUpdate);
-
-        return () => {
-            battleEventEmitter.off('battleUpdated', handleBattleUpdate);
-        };
-    }, [battleEntities]);
-    
-
-    // const handleRestoreBurners = async () => {
-    //     try {
-    //         await account?.applyFromClipboard();
-    //         setClipboardStatus({
-    //             message: "Burners restored successfully!",
-    //             isError: false,
-    //         });
-    //     } catch (error) {
-    //         setClipboardStatus({
-    //             message: `Failed to restore burners from clipboard`,
-    //             isError: true,
-    //         });
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     if (clipboardStatus.message) {
-    //         const timer = setTimeout(() => {
-    //             setClipboardStatus({ message: "", isError: false });
-    //         }, 3000);
-
-    //         return () => clearTimeout(timer);
-    //     }
-    // }, [clipboardStatus.message]);
-
+    //const board = Array(20).fill(null).map(() => Array(12).fill(EmptyCell.Empty));
+    const { board, startGame, isPlaying, score, upcomingBlocks, collisions } = useGameLogic();
 
     return (
         <>
-            {/* <div>
-                <h2>{masterAccount.address}</h2>
-                <h2>{account.account.address}</h2>
-            </div> */}
-            {/* <button onClick={account?.create}>
-                {account?.isDeploying ? "deploying burner" : "create burner"}
-            </button>
-            {account && account?.list().length > 0 && (
-                <button onClick={async () => await account?.copyToClipboard()}>
-                    Save Burners to Clipboard
-                </button>
-            )}
-            <button onClick={handleRestoreBurners}>
-                Restore Burners from Clipboard
-            </button>
-            {clipboardStatus.message && (
-                <div className={clipboardStatus.isError ? "error" : "success"}>
-                    {clipboardStatus.message}
-                </div>
-            )}
-
-            <div className="card">
-                select signer:{" "}
-                <select
-                    value={account ? account.account.address : ""}
-                    onChange={(e) => account.select(e.target.value)}
-                >
-                    {account?.list().map((account, index) => {
-                        return (
-                            <option value={account.address} key={index}>
-                                {account.address}
-                            </option>
-                        );
-                    })}
-                </select>
-                <div>
-                    <button onClick={() => account.clear()}>
-                        Clear burners
-                    </button>
-                </div>
-            </div> */}
-
-            <div className="container">
-                <div className="card">
-                    <button onClick={() => createBattle(masterAccount)} className="button-style">Create Battle</button>
-                </div>
-            </div>
-            <div className="container">
-                <div className="card">
-                    <button onClick={() => joinBattle(secondAccount, battleId)} className="button-style">Join Battle</button>
-                    {battleId > -1 && (<p className="text-style">Chosen battle ID: {battleId}</p>)}
-                </div>
-            </div>
-            <div className="container">
-                <div className="card">
-                    <button onClick={() => startBattle(masterAccount, battleId)} className="button-style">START</button>
-                    {battleId > - 1 && (<p className="text-style">Chosen battle ID: {battleId}</p>)}
-                </div>
-            </div>
-            <div className="container">
-                {battleEntities.length > 0 && (
-                    <h3>Click on the battle you wish to join/start:</h3>
-                )}
-                {battleEntities.map(entity => {
-                    const val = getComponentValue(Battle, entity);
-                    return val ? (
-                        <BattleComponent key={Number(val.id)} battleId={val.id} joined={val.player1 !== val.player2} started={val.started} setBattleIdValue={setBattleId} />
-                    ) : <></>;
-                })}
-            </div>
+            <h1></h1>
+            <Board currentBoard={board} collidedCells={collisions}/>
+            <div className="controls">
+        {/* <h2>Score: {score}</h2> */}
+        <h2/>
+        {isPlaying ? ( 
+          <AvailableBlocks avaliableBlocks={upcomingBlocks} />
+        ) : (
+          <button onClick={startGame}>New Game</button>
+        )}
+      </div>
         </>
     );
 }
