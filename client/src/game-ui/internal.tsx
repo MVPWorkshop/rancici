@@ -93,7 +93,6 @@ export const shapePlacementInfo = (cursor, grid, pointerShapeHandler) => {
         //potential placement
         for (const [i, j] of pointerShapeHandler.shape.cells) {
           const [cellX, cellY] = [xIdx + i, yIdx + j];
-          console.log({ cellX, cellY });
 
           if (cellX < GRID_W && cellY < GRID_H) {
             const cell = grid[cellX][cellY];

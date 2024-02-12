@@ -14,7 +14,6 @@ const App = () => {
 
   return (
     <div className="App">
-      <h3>App</h3>
       <div className="game-ui-root"></div>
     </div>
   );

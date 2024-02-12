@@ -59,14 +59,6 @@ class Shape {
 }
 
 class GameUI extends Phaser.Scene {
-  /**
-   *
-   * {
-   *  grid: ...
-   *  selectedShape:
-   *
-   * }
-   */
   state = {};
 
   create() {
@@ -177,6 +169,15 @@ class GameUI extends Phaser.Scene {
     });
 
     this.input.on("pointerdown", () => {
+      if (pointerShapeHandler.shapeCanBePlaced == false) {
+        return;
+      }
+
+      for (const gridCell of pointerShapeHandler.okGridCells) {
+        gridCell.taken = true;
+        gridCell.graphics = pointerShapeHandler.shape.graphics;
+      }
+
       redraw();
     });
 
