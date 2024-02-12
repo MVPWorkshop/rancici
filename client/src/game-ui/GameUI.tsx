@@ -31,30 +31,71 @@ import * as internal from "./internal";
 type CellPos = Array<number>;
 
 class Shape {
-  cells: Array<CellPos> = [];
+  cells = [];
   color: number = 0x0;
   massCenterX: number = 0.0;
   massCenterY: number = 0.0;
   direction: "UP" | "DOWN" | "LEFT" | "RIGHT" = "UP";
   graphics: null;
+  allDirections = [];
+  massCenters = [];
+  currDirectionIdx = 0;
 
   constructor(name: string) {
     if (name === "L") {
-      this.cells = [
-        [0, 0],
-        [0, 1],
-        [0, 2],
-        [1, 2],
+      this.allDirections = [
+        [
+          [0, 0],
+          [0, 1],
+          [0, 2],
+          [1, 2],
+        ],
+        [
+          [0, 1],
+          [1, 1],
+          [2, 1],
+          [2, 0],
+        ],
+        [
+          [0, 0],
+          [1, 0],
+          [1, 1],
+          [1, 2],
+        ],
+
+        [
+          [0, 0],
+          [0, 1],
+          [1, 0],
+          [2, 0],
+        ],
       ];
+
+      this.massCenters = [
+        [1.0, 1.5],
+        [1.5, 1.0],
+        [1.0, 1.5],
+        [1.5, 1.0],
+      ];
+
+      this.cells = this.allDirections[this.currDirectionIdx];
+      this.massCenterX = this.massCenters[this.currDirectionIdx][0];
+      this.massCenterY = this.massCenters[this.currDirectionIdx][1];
+
       this.color = 0x1101ff;
-      this.massCenterY = 1.5;
-      this.massCenterX = 1.0;
       this.direction = "UP";
     }
   }
 
   setGraphics(_graphics) {
     this.graphics = _graphics;
+  }
+
+  rotate() {
+    this.currDirectionIdx = (this.currDirectionIdx + 1) % 4;
+    this.cells = this.allDirections[this.currDirectionIdx];
+    this.massCenterX = this.massCenters[this.currDirectionIdx][0];
+    this.massCenterY = this.massCenters[this.currDirectionIdx][1];
   }
 }
 
@@ -155,16 +196,10 @@ class GameUI extends Phaser.Scene {
       errorGridCells: [],
     };
 
-    this.state = { grid, pointerShapeHandler };
+    this.state = { grid, pointerShapeHandler, keyCanBePressed: true };
 
     this.input.on("pointermove", () => {
-      const { canBePlaced, okGridCells, errorGridCells } =
-        internal.shapePlacementInfo(cursor, grid, pointerShapeHandler);
-
-      pointerShapeHandler.shapeCanBePlaced = canBePlaced;
-      pointerShapeHandler.okGridCells = okGridCells;
-      pointerShapeHandler.errorGridCells = errorGridCells;
-
+      internal.updateShapePointerHandler(cursor, grid, pointerShapeHandler);
       redraw();
     });
 
@@ -180,6 +215,25 @@ class GameUI extends Phaser.Scene {
 
       redraw();
     });
+
+    this.input.keyboard?.on(
+      "keydown",
+      async () => {
+        //Debounce key pressing
+        if (this.state.keyCanBePressed == false) {
+          return;
+        }
+        console.log(`Rotating`);
+        this.state.keyCanBePressed = false;
+        pointerShapeHandler.shape.rotate();
+        internal.updateShapePointerHandler(cursor, grid, pointerShapeHandler);
+
+        redraw();
+        await internal.delay(100);
+        this.state.keyCanBePressed = true;
+      },
+      this
+    );
 
     const redraw = () => {
       allGraphics.map((graphic) => graphic.clear());

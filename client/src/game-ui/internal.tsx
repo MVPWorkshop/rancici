@@ -113,18 +113,23 @@ export const shapePlacementInfo = (cursor, grid, pointerShapeHandler) => {
     }
   }
 
-  for (const [i, j] of pointerShapeHandler.shape.cells) {
-    const [cellX, cellY] = [xIdx + i, yIdx + j];
-
-    if (cellX < GRID_W && cellY < GRID_H) {
-      const cell = grid[cellX][cellY];
-      if (cell.taken == false) {
-        cell.graphics = mightBeTakenGraphics;
-      } else {
-        cell.graphics = errorCannotBeTakenGaphics;
-      }
-
-      cell.graphics.fillRectShape(cell.rect);
-    }
-  }
+  return { canBePlaced: false, okGridCells: [], errorGridCells: [] };
 };
+
+export const updateShapePointerHandler = (
+  cursor,
+  grid,
+  pointerShapeHandler
+) => {
+  const { canBePlaced, okGridCells, errorGridCells } = shapePlacementInfo(
+    cursor,
+    grid,
+    pointerShapeHandler
+  );
+
+  pointerShapeHandler.shapeCanBePlaced = canBePlaced;
+  pointerShapeHandler.okGridCells = okGridCells;
+  pointerShapeHandler.errorGridCells = errorGridCells;
+};
+
+export const delay = (ms) => new Promise((res) => setTimeout(res, ms));

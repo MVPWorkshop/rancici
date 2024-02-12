@@ -19,11 +19,7 @@ const init = async () => {
   const root = ReactDOM.createRoot(rootElement as HTMLElement);
 
   if (DEV_BLOCK_WALLET_CONNECT == true) {
-    root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    );
+    root.render(<App />);
     return;
   }
 
