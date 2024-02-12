@@ -5,7 +5,7 @@ const Navbar = ({ stateManager }) => {
   return (
     <div className="Navbar">
       <h3>Rancici: Starknet Winter Hackathon</h3>
-
+      <h5>Argent Addr: {stateManager.state.argentWallet.address}</h5>
       <button onClick={async () => disconnectWallet(stateManager)}>
         Disconnect Wallet
       </button>
