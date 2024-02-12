@@ -27,7 +27,6 @@ const Battle = ({ stateManager }) => {
 export default Battle;
 
 const fetchDataAndSetupProgression = async (stateManager) => {
-  // console.log(stateManager.state.pageState);
   await utils.delay(400);
 
   console.log(stateManager.state);
@@ -35,9 +34,6 @@ const fetchDataAndSetupProgression = async (stateManager) => {
   let stepIdx = 0;
 
   setInterval(() => {
-    // const stepIdx = stateManager.state.pageState.stepIdx;
-    // console.log(stateManager.state.pageState, { stepIdx });
-
     if (stepIdx > STEP_COUNT) {
       return;
     }
