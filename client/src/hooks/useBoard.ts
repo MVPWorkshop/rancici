@@ -13,6 +13,7 @@ type BoardState = {
   collisions: [number, number][];
   chosenBlockId: number | null;
   chosenBlock: Block | null; //na koji smo kliknuli
+  chosenBlockShape: BlockShape | null;
 };
 
 export function useTetrisBoard(): [BoardState, Dispatch<Action>] {
@@ -27,6 +28,7 @@ export function useTetrisBoard(): [BoardState, Dispatch<Action>] {
       collisions: [],
       chosenBlockId: null,
       chosenBlock: null,
+      chosenBlockShape: null
     },
     (emptyState) => { //inicijalizujemo boardpre nego sto igrica i pocne
       const state = {
@@ -197,6 +199,7 @@ function boardReducer(state: BoardState, action: Action): BoardState {
         collisions: [],
         chosenBlockId: null,
         chosenBlock: null,
+      chosenBlockShape: null
       };
     case 'drop':
       console.log('case drop'); 
@@ -215,7 +218,7 @@ function boardReducer(state: BoardState, action: Action): BoardState {
 
       const block = newState.chosenBlock ?? Block.None;
       newState.droppingBlock = block;
-      newState.droppingShape = SHAPES[block].shape;
+      newState.droppingShape = newState.chosenBlockShape ?? SHAPES[block].shape;
       newState.droppingRow= action.hoveredRowIndex ?? 0;
       newState.droppingColumn=action.hoveredColumnIndex ?? 0;
       newState.collisions = checkCollisions2(newState.board,
@@ -243,24 +246,32 @@ function boardReducer(state: BoardState, action: Action): BoardState {
         collisions: [],
         chosenBlockId: null,
         chosenBlock: null,
+        chosenBlockShape: null
       };
     case 'move':
       const rotatedShape = action.isRotating
         ? rotateBlock(newState.droppingShape)
         : newState.droppingShape;
-      let columnOffset = action.isPressingLeft ? -1 : 0;
-      columnOffset = action.isPressingRight ? 1 : columnOffset;
-      if (
-        !hasCollisions(
-          newState.board,
+      console.log(rotatedShape);
+      // let columnOffset = action.isPressingLeft ? -1 : 0;
+      // columnOffset = action.isPressingRight ? 1 : columnOffset;
+      // if (
+      //   !hasCollisions(
+      //     newState.board,
+      //     rotatedShape,
+      //     newState.droppingRow,
+      //     newState.droppingColumn //+ columnOffset
+      //   )
+      // ) {
+        // newState.droppingColumn += columnOffset;
+        
+        newState.chosenBlockShape = rotatedShape;
+        newState.droppingShape = rotatedShape;
+        newState.collisions = checkCollisions2(newState.board,
           rotatedShape,
           newState.droppingRow,
-          newState.droppingColumn + columnOffset
-        )
-      ) {
-        newState.droppingColumn += columnOffset;
-        newState.droppingShape = rotatedShape;
-      }
+          newState.droppingColumn);
+      // }
       break;
     default:
       const unhandledType: never = action.type;

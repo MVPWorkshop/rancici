@@ -128,13 +128,13 @@ export function useGameLogic() {
 //     gameTick();
 //   }, tickSpeed);
 
-//   useEffect(() => {
-//     if (!isPlaying) {
-//       return;
-//     }
+  useEffect(() => {
+    // if (!isPlaying) {
+    //   return;
+    // }
 
-//     let isPressingLeft = false;
-//     let isPressingRight = false;
+    let isPressingLeft = false;
+    let isPressingRight = false;
 //     let moveIntervalID: NodeJS.Timeout | undefined;
 
 //     const updateMovementInterval = () => {
@@ -153,32 +153,31 @@ export function useGameLogic() {
 //       }, 300);
 //     };
 
-//     const handleKeyDown = (event: KeyboardEvent) => {
-//       if (event.repeat) {
-//         return;
-//       }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat) {
+        return;
+      }
 
-//       if (event.key === 'ArrowDown') {
-//         setTickSpeed(TickSpeed.Fast);
-//       }
+      if (event.key === 'ArrowDown') {
+        setTickSpeed(TickSpeed.Fast);
+      }
 
-//       if (event.key === 'ArrowUp') {
-//         dispatchBoardState({
-//           type: 'move',
-//           isRotating: true,
-//         });
-//       }
+      if (event.key === 'ArrowUp') {
+        console.log("up pressed");
+        dispatchBoardState({
+          type: 'move',
+          isRotating: true,
+        });
+      }
 
-//       if (event.key === 'ArrowLeft') {
-//         isPressingLeft = true;
-//         updateMovementInterval();
-//       }
+      if (event.key === 'ArrowLeft') {
+        isPressingLeft = true;
+      }
 
-//       if (event.key === 'ArrowRight') {
-//         isPressingRight = true;
-//         updateMovementInterval();
-//       }
-//     };
+      if (event.key === 'ArrowRight') {
+        isPressingRight = true;
+      }
+    };
 
 //     const handleKeyUp = (event: KeyboardEvent) => {
 //       if (event.key === 'ArrowDown') {
@@ -196,15 +195,15 @@ export function useGameLogic() {
 //       }
 //     };
 
-//     document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
 //     document.addEventListener('keyup', handleKeyUp);
-//     return () => {
-//       document.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
 //       document.removeEventListener('keyup', handleKeyUp);
 //       clearInterval(moveIntervalID);
 //       setTickSpeed(TickSpeed.Normal);
-//     };
-//   }, [dispatchBoardState, isPlaying]);
+    };
+  }, [dispatchBoardState]);
 
   const renderedBoard = structuredClone(board) as BoardShape; //posto nam se pomera block sve dok se ne komituje, i menja nam se njegova pozicija onda kloniramo postojeci board i sa klonom radimo(to mi treba u slucaju da user moze da pomera shape, ali mi to nema smisla kod mene, IZBACI OVAJ DEO)
   if (isPlaying) {
