@@ -25,7 +25,6 @@ function App() {
         secondAccount
     } = useDojo();
 
-    //const board = Array(20).fill(null).map(() => Array(12).fill(EmptyCell.Empty));
     const { board, startGame, isPlaying, score, upcomingBlocks, collisions } = useGameLogic();
 
     return (

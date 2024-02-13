@@ -25,9 +25,7 @@ export enum Block {
   
   export type BoardShape = CellOptions[][];
   
-  export type BlockShape = boolean[][]; //2D array of booleans= true: shape fills that section, false: empty cell
-  //tako ako se rotiraju jednostavno cemo da rotiramo booleans u toj matrici
-
+  export type BlockShape = boolean[][];
   type ShapesObj = {
     [key in Block]: {
       shape: BlockShape;

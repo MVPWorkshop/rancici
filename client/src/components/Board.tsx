@@ -11,28 +11,22 @@ export const cellHoverEmitter = new EventEmitter();
 export const cellClickEmitter = new EventEmitter();
 
 function Board({ currentBoard, collidedCells }: Props) {
-    // const handleMouseEnter = (rowIndex: number, colIndex: number) => {
-    //     cellHoverEmitter.emit('cellHover', { rowIndex, colIndex }); // Emit an event with row and column indices
-    //   };
 
-    let timeoutId: NodeJS.Timeout | null = null; // Variable to hold the timeout ID
+    let timeoutId: NodeJS.Timeout | null = null;
 
     const handleMouseEnter = (rowIndex: number, colIndex: number) => {
-        // Clear any existing timeout
         if (timeoutId) {
             clearTimeout(timeoutId);
             timeoutId = null;
         }
 
-        // Set a timeout to emit the event after 30 milliseconds
         timeoutId = setTimeout(() => {
-            cellHoverEmitter.emit('cellHover', { rowIndex, colIndex }); // Emit an event with row and column indices
-            timeoutId = null; // Reset the timeout ID
+            cellHoverEmitter.emit('cellHover', { rowIndex, colIndex });
+            timeoutId = null;
         }, 100);
     };
 
     const handleMouseLeave = () => {
-        // Clear the timeout if the mouse leaves the cell
         if (timeoutId) {
             clearTimeout(timeoutId);
             timeoutId = null;

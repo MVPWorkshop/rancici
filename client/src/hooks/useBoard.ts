@@ -9,10 +9,10 @@ type BoardState = {
   droppingRow: number;
   droppingColumn: number;
   droppingBlock: Block;
-  droppingShape: BlockShape; //ako user rotira block da zapamtimo kakav mu je shape posle rotacije
+  droppingShape: BlockShape; 
   collisions: [number, number][];
   chosenBlockId: number | null;
-  chosenBlock: Block | null; //na koji smo kliknuli
+  chosenBlock: Block | null; 
   chosenBlockShape: BlockShape | null;
   numberOfBlocksOnBoard: number;
 };
@@ -32,7 +32,7 @@ export function useTetrisBoard(): [BoardState, Dispatch<Action>] {
       chosenBlockShape: null,
       numberOfBlocksOnBoard: 0
     },
-    (emptyState) => { //inicijalizujemo boardpre nego sto igrica i pocne
+    (emptyState) => { 
       const state = {
         ...emptyState,
         board: getEmptyBoard(),
@@ -52,15 +52,13 @@ export function getEmptyBoard(height = BOARD_HEIGHT): BoardShape {
 
 export function getBoardWithCharBlocks(height = BOARD_HEIGHT, width = BOARD_HEIGHT): BoardShape {
   const board: BoardShape = [];
-  const numBlocks = 5; // Number of blocks to place
+  const numBlocks = 5; 
 
-  // Initialize the board with empty cells
   for (let i = 0; i < height; i++) {
     const row = Array(width).fill(EmptyCell.Empty);
     board.push(row);
   }
 
-  // Place the blocks randomly within the board
   for (let i = 0; i < numBlocks; i++) {
     const randomRow = Math.floor(Math.random() * height);
     const randomCol = Math.floor(Math.random() * width);
@@ -71,7 +69,7 @@ export function getBoardWithCharBlocks(height = BOARD_HEIGHT, width = BOARD_HEIG
 }
 
 
-export function hasCollisions( //da li se block preklapa sa nekim drugim
+export function hasCollisions( 
   board: BoardShape,
   currentShape: BlockShape,
   row: number,
@@ -95,7 +93,7 @@ export function hasCollisions( //da li se block preklapa sa nekim drugim
     });
   return hasCollision;
 }
-export function checkCollisions2(
+export function getCollisions(
   board: BoardShape,
   currentShape: BlockShape,
   row: number,
@@ -106,31 +104,6 @@ export function checkCollisions2(
   currentShape
   .filter((shapeRow) => shapeRow.some((isSet) => isSet))
   .forEach((shapeRow: boolean[], rowIndex: number) => {
-    shapeRow.forEach((isSet: boolean, colIndex: number) => {
-      if (
-        isSet &&
-        (row + rowIndex >= board.length ||
-          column + colIndex >= board[0].length ||
-          column + colIndex < 0 ||
-          board[row + rowIndex][column + colIndex] !== EmptyCell.Empty)
-      ) {
-        collidedCells.push([row + rowIndex, column + colIndex]);
-        console.log("Collision detected at: " + (row + rowIndex) + ", " + (column + colIndex));
-      }
-    });
-  });
-
-  return collidedCells;
-}
-export function checkCollisions(
-  board: BoardShape,
-  currentShape: BlockShape,
-  row: number,
-  column: number
-): [number, number][] {
-  const collidedCells: [number, number][] = [];
-
-  currentShape.forEach((shapeRow: boolean[], rowIndex: number) => {
     shapeRow.forEach((isSet: boolean, colIndex: number) => {
       if (
         isSet &&
@@ -171,13 +144,13 @@ function rotateBlock(shape: BlockShape): BlockShape {
 }
 
 type Action = {
-  type: 'start' | 'drop' | 'commit' | 'move' | 'setChosenBlock'|'commitShape';//start game, drop a block, commiting=saving postition of the block when it hits the bottom(kod mene je to kad user klikne na polje)
+  type: 'start' | 'drop' | 'commit' | 'move' | 'setChosenBlock';
   newBoard?: BoardShape;
   newBlock?: Block;
   isPressingLeft?: boolean;
   isPressingRight?: boolean;
   isRotating?: boolean;
-  block?: Block; //ovo sam ja dodala i koristila sa useEffect
+  block?: Block;
   hoveredRowIndex?: number;
   hoveredColumnIndex?: number;
   chosenBlockId?:number;
@@ -189,15 +162,13 @@ function boardReducer(state: BoardState, action: Action): BoardState {
 
   switch (action.type) {
     case 'start':
-      const firstBlock = Block.None;//getRandomBlock();
-      // const emptyBoard= getEmptyBoard();
       const boardWithChars = getBoardWithCharBlocks();
       return {
         board: boardWithChars,
-        droppingRow: 0, //block nam pada sa vrha
-        droppingColumn: 3, //da blok bude na centru
-        droppingBlock: firstBlock,
-        droppingShape: SHAPES[firstBlock].shape,
+        droppingRow: -1,
+        droppingColumn: -1,
+        droppingBlock: Block.None,
+        droppingShape: SHAPES[Block.None].shape,
         collisions: [],
         chosenBlockId: null,
         chosenBlock: null,
@@ -206,18 +177,6 @@ function boardReducer(state: BoardState, action: Action): BoardState {
       };
     case 'drop':
       console.log('case drop'); 
-      // newState.droppingRow++;
-      // const block = action.block ?? Block.L;
-      // newState.droppingBlock = block;
-      // newState.droppingRow= action.droppingRow ?? 0;
-      // newState.droppingColumn=action.droppingColumn ?? 0;
-      // newState.droppingShape=SHAPES[block].shape;
-      // newState.collisions =  checkCollisions(
-      //   newState.board,
-      //   newState.droppingShape,
-      //   newState.droppingRow,
-      //   newState.droppingColumn
-      // );
       if(newState.chosenBlock == null || newState.chosenBlockId == null){
         break;
       }
@@ -227,31 +186,16 @@ function boardReducer(state: BoardState, action: Action): BoardState {
       newState.droppingShape = newState.chosenBlockShape ?? SHAPES[block].shape;
       newState.droppingRow= action.hoveredRowIndex ?? 0;
       newState.droppingColumn=action.hoveredColumnIndex ?? 0;
-      newState.collisions = checkCollisions2(newState.board,
+      newState.collisions = getCollisions(newState.board,
           newState.droppingShape,
           newState.droppingRow,
           newState.droppingColumn);
-
-      // console.log("collisions row: " + +newState.droppingRow + "column: " + newState.droppingColumn );
-      // console.log("for values: " + action.droppingRow + "and " + action.droppingColumn);
       break;
     case 'setChosenBlock':
       newState.chosenBlock = action.chosenBlock ?? Block.None;
       newState.chosenBlockId = action.chosenBlockId ?? -1;
       break;
-    case 'commitShape':
-
-      break;
     case 'commit':
-      // if(hasCollisions(
-      //       newState.board,
-      //       newState.chosenBlockShape!,
-      //       newState.droppingRow,
-      //       newState.droppingColumn //+ columnOffset
-      //     )){
-      //       break;
-      //     }
-      //podesis da se izbrise chosen block
       return {
         board: [
           ...getEmptyBoard(BOARD_HEIGHT - action.newBoard!.length),
@@ -272,25 +216,13 @@ function boardReducer(state: BoardState, action: Action): BoardState {
         ? rotateBlock(newState.droppingShape)
         : newState.droppingShape;
       console.log(rotatedShape);
-      // let columnOffset = action.isPressingLeft ? -1 : 0;
-      // columnOffset = action.isPressingRight ? 1 : columnOffset;
-      // if (
-      //   !hasCollisions(
-      //     newState.board,
-      //     rotatedShape,
-      //     newState.droppingRow,
-      //     newState.droppingColumn //+ columnOffset
-      //   )
-      // ) {
-        // newState.droppingColumn += columnOffset;
         
         newState.chosenBlockShape = rotatedShape;
         newState.droppingShape = rotatedShape;
-        newState.collisions = checkCollisions2(newState.board,
+        newState.collisions = getCollisions(newState.board,
           rotatedShape,
           newState.droppingRow,
           newState.droppingColumn);
-      // }
       break;
     default:
       const unhandledType: never = action.type;

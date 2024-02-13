@@ -22,9 +22,8 @@ export function useGameLogic() {
   const [score, setScore] = useState(0);
   const [upcomingBlocks, setUpcomingBlocks] = useState<Block[]>([]);
   const [isCommitting, setIsCommitting] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false); //da li je pocela igra
-  const [tickSpeed, setTickSpeed] = useState<TickSpeed | null>(null); //kojom brzinom pada block
-//   const [collidedCells, setCollidedCells] = useState<[number, number][]>([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [tickSpeed, setTickSpeed] = useState<TickSpeed | null>(null);
 const [selectedBlockCount, setSelectedBlockCount] = useState(0);
 
 
@@ -56,16 +55,15 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
    
   const commitPosition = useCallback(() => {
     if (hasCollisions(board, droppingShape, droppingRow, droppingColumn)) {
-    //   setIsCommitting(false);
-    //   setTickSpeed(TickSpeed.Normal);
       return;
-    } //ovde proverimo da li je user otklonio onaj collision(imao je dodatno vreme za to) i ako jeste onda nastavlja da pada block
-    //a za slucaj da nije, onda znaci da je block nasao svoje mesto i spreman je za commit i onda cemo da sacuvamo to stanje, to jest kako izgleda ceo board kad taj novi blok se pozicionira na njega!!!
+    } 
     const newBoard = structuredClone(board) as BoardShape;
+
     console.log("drop block: "+ droppingBlock);
     console.log("drop shape: "+ droppingShape);
     console.log("drop row: "+ droppingRow);
     console.log("drop column: "+ droppingColumn);
+
     addShapeToBoard(
       newBoard,
       droppingBlock,
@@ -80,31 +78,14 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
         newBoard.splice(row, 1);
       }
     }
-
-    // const newUpcomingBlocks = structuredClone(upcomingBlocks) as Block[];
-    // const newBlock = newUpcomingBlocks.pop() as Block;
-    // newUpcomingBlocks.unshift(getRandomBlock());
-
-    // if (hasCollisions(board, SHAPES[newBlock].shape, 0, 3)) {
-    //   setIsPlaying(false);
-    //   setTickSpeed(null);
-    // } else {
-    //   setTickSpeed(TickSpeed.Normal);
-    // }
-    // //setUpcomingBlocks(newUpcomingBlocks);
-    // setScore((prevScore) => prevScore + getPoints(numCleared));
-    // setSelectedBlockCount(prevCount => prevCount + 1);
     
     dispatchBoardState({
       type: 'commit',
       newBoard: [...getEmptyBoard(BOARD_HEIGHT - newBoard.length), ...newBoard],
-      //newBlock,
     });
    
     const blocksWithoutCommittedOne = upcomingBlocks.filter(block => block !== droppingBlock);
     setUpcomingBlocks(blocksWithoutCommittedOne);
-
-    // setIsCommitting(false);
   }, [
     board,
     dispatchBoardState,
@@ -117,37 +98,6 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
     numberOfBlocksOnBoard
   ]);
 
-//   const gameTick = useCallback(() => {
-//     if (isCommitting) {
-//       commitPosition();
-//     } else if (
-//       hasCollisions(board, droppingShape, droppingRow, droppingColumn)
-//     ) {
-//       //setTickSpeed(TickSpeed.Sliding); //ako postoji collision sa nekim drugim blokom onda cemo da usporimo ticker, da bi user imao vremena da pomeri blok levo ili desno(to je ono kad padne na pod)
-      
-//       //setIsCommitting(true);
-//     } 
-//     // else {
-//     //   dispatchBoardState({ type: 'drop' });
-//     // }
-//   }, [
-//     board,
-//     commitPosition,
-//     dispatchBoardState,
-//     droppingColumn,
-//     droppingRow,
-//     droppingShape,
-//     isCommitting,
-//   ]); //eslint nam daje sugestiju sta treba u [] da se
-
-//   useInterval(() => {
-//     return;
-//     if (!isPlaying) {
-//       return;
-//     }
-//     gameTick();
-//   }, tickSpeed);
-
   useEffect(() => {
     // if (!isPlaying) {
     //   return;
@@ -155,23 +105,6 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
 
     let isPressingLeft = false;
     let isPressingRight = false;
-//     let moveIntervalID: NodeJS.Timeout | undefined;
-
-//     const updateMovementInterval = () => {
-//       clearInterval(moveIntervalID);
-//       dispatchBoardState({
-//         type: 'move',
-//         isPressingLeft,
-//         isPressingRight,
-//       });
-//       moveIntervalID = setInterval(() => {
-//         dispatchBoardState({
-//           type: 'move',
-//           isPressingLeft,
-//           isPressingRight,
-//         });
-//       }, 300);
-//     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) {
@@ -199,33 +132,13 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
       }
     };
 
-//     const handleKeyUp = (event: KeyboardEvent) => {
-//       if (event.key === 'ArrowDown') {
-//         setTickSpeed(TickSpeed.Normal);
-//       }
-
-//       if (event.key === 'ArrowLeft') {
-//         isPressingLeft = false;
-//         updateMovementInterval();
-//       }
-
-//       if (event.key === 'ArrowRight') {
-//         isPressingRight = false;
-//         updateMovementInterval();
-//       }
-//     };
-
     document.addEventListener('keydown', handleKeyDown);
-//     document.addEventListener('keyup', handleKeyUp);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-//       document.removeEventListener('keyup', handleKeyUp);
-//       clearInterval(moveIntervalID);
-//       setTickSpeed(TickSpeed.Normal);
     };
   }, [dispatchBoardState]);
 
-  const renderedBoard = structuredClone(board) as BoardShape; //posto nam se pomera block sve dok se ne komituje, i menja nam se njegova pozicija onda kloniramo postojeci board i sa klonom radimo(to mi treba u slucaju da user moze da pomera shape, ali mi to nema smisla kod mene, IZBACI OVAJ DEO)
+  const renderedBoard = structuredClone(board) as BoardShape; 
   if (isPlaying) {
     addShapeToBoard(
       renderedBoard,
@@ -236,23 +149,13 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
     );
   }
 
-//   const [chosenBlock, setChosenBlock] = useState<{ blockId: number | null; blockShape: Block | null }>({
-//     blockId: null,
-//     blockShape: null,
-//   });
-
 //hook za lkik na AVAILABLE BLOCK
   useEffect(() => {
     const handleBlockSelection = ({ blockId, blockShape }: { blockId: number; blockShape: Block }) => {
-      // Perform actions based on the selected block ID and shape
-      // For example:
       console.log('Selected Block ID:', blockId);
       console.log('Selected Block:', blockShape);
 
       dispatchBoardState({type: 'setChosenBlock', chosenBlock: blockShape, chosenBlockId: blockId} );
-    //   setChosenBlock({ blockId, blockShape });
-    //   console.log('set Block ID:', chosenBlock.blockId);
-    //   console.log('set Block:', chosenBlock.blockShape);
     };
 
     chosenBlockEmitter.on('blockSelected', handleBlockSelection);
@@ -268,7 +171,7 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
     droppingRow,
     droppingShape,
     upcomingBlocks,
-  ]); //treba li chosenBlock?
+  ]); 
   
   //hook za HOVER
   useEffect(() => {
@@ -291,19 +194,14 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
     droppingRow,
     droppingShape,
     upcomingBlocks,
-]); // [chosenBlock.blockId, chosenBlock.blockShape, chosenBlock]
+]); 
 
 //hook za CELL CLICK
 useEffect(() => {
     const handleCellClick = ({ rowIndex, colIndex }: { rowIndex: number; colIndex: number }) => {
       console.log('Clicked Cell Row:', rowIndex + ' Clicked Cell Column:', colIndex);
-    
-      console.log("Selcted blocks count: " + selectedBlockCount);
-
-      
 
       commitPosition();
-    //   setSelectedBlockCount(selectedBlockCount +1);
     };
 
     cellHoverEmitter.on('cellClick', handleCellClick);
@@ -324,7 +222,6 @@ useEffect(() => {
 //hook za kraj igre
 useEffect(() => {
     if (numberOfBlocksOnBoard  == 3) {
-      // Perform some action if there are more than 10 blocks on the board
       setIsPlaying(false);
     }
   }, [numberOfBlocksOnBoard]); 
@@ -340,23 +237,6 @@ useEffect(() => {
   };
 }
 
-function getPoints(numCleared: number): number {
-  switch (numCleared) {
-    case 0:
-      return 0;
-    case 1:
-      return 100;
-    case 2:
-      return 300;
-    case 3:
-      return 500;
-    case 4:
-      return 800;
-    default:
-      throw new Error('Unexpected number of rows cleared');
-  }
-}
-
 function addShapeToBoard(
   board: BoardShape,
   droppingBlock: Block,
@@ -368,19 +248,19 @@ function addShapeToBoard(
         return;
       }
   droppingShape
-    .filter((row) => row.some((isSet) => isSet)) //uzimamo samo one true vrednosti iz matrice bloka, jer false ne uticu na renderovanje
-    .forEach((row: boolean[], rowIndex: number) => { //onda za svaki true renderujemo board na toj poziciji
+    .filter((row) => row.some((isSet) => isSet)) 
+    .forEach((row: boolean[], rowIndex: number) => { 
       row.forEach((isSet: boolean, colIndex: number) => {
         if (isSet) {
             const newRow = droppingRow + rowIndex;
           const newCol = droppingColumn + colIndex;
           if (
-            newRow < 0 || newRow >= board.length || // Check row bounds
-            newCol < 0 || newCol >= board[0].length // Check column bounds
+            newRow < 0 || newRow >= board.length ||
+            newCol < 0 || newCol >= board[0].length 
           ) {
-            return; // If position is out of bounds, return without modifying the board
+            return; 
           }
-          board[newRow][newCol] = droppingBlock; //
+          board[newRow][newCol] = droppingBlock; 
         }
       });
     });

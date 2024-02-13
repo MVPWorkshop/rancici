@@ -14,4 +14,3 @@ export function useInterval(callback: () => void, delay: number | null): void {
     return () => clearInterval(intervalID);
   }, [delay]);
 }
-//koristimo jer kada je isPlaying false, znaci ne igramo onda necemo da nam ide vreme
