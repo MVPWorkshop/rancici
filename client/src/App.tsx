@@ -17,7 +17,7 @@ const App = () => {
     burnerWallet: {
       address: "...",
     },
-    page: "PreBattle", // "Login" | "PreBattle" | "Battle"
+    page: "Battle", // "Login" | "PreBattle" | "Battle"
     pageState: {},
   });
   const updateState = (newState) => {
