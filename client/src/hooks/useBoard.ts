@@ -14,6 +14,7 @@ type BoardState = {
   chosenBlockId: number | null;
   chosenBlock: Block | null; //na koji smo kliknuli
   chosenBlockShape: BlockShape | null;
+  numberOfBlocksOnBoard: number;
 };
 
 export function useTetrisBoard(): [BoardState, Dispatch<Action>] {
@@ -28,7 +29,8 @@ export function useTetrisBoard(): [BoardState, Dispatch<Action>] {
       collisions: [],
       chosenBlockId: null,
       chosenBlock: null,
-      chosenBlockShape: null
+      chosenBlockShape: null,
+      numberOfBlocksOnBoard: 0
     },
     (emptyState) => { //inicijalizujemo boardpre nego sto igrica i pocne
       const state = {
@@ -199,7 +201,8 @@ function boardReducer(state: BoardState, action: Action): BoardState {
         collisions: [],
         chosenBlockId: null,
         chosenBlock: null,
-      chosenBlockShape: null
+      chosenBlockShape: null,
+      numberOfBlocksOnBoard: 0
       };
     case 'drop':
       console.log('case drop'); 
@@ -261,7 +264,8 @@ function boardReducer(state: BoardState, action: Action): BoardState {
         collisions: [],
         chosenBlockId: null,
         chosenBlock: null,
-        chosenBlockShape: null
+        chosenBlockShape: null,
+        numberOfBlocksOnBoard: newState.numberOfBlocksOnBoard + 1,
       };
     case 'move':
       const rotatedShape = action.isRotating

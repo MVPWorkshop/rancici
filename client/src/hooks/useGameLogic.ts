@@ -29,7 +29,7 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
 
 
   const [
-    { board, droppingRow, droppingColumn, droppingBlock, droppingShape, collisions },
+    { board, droppingRow, droppingColumn, droppingBlock, droppingShape, collisions, numberOfBlocksOnBoard },
     dispatchBoardState,
   ] = useTetrisBoard();
 
@@ -53,7 +53,7 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
     setTickSpeed(TickSpeed.Normal);
     dispatchBoardState({ type: 'start' });
   }, [dispatchBoardState]);
-
+   
   const commitPosition = useCallback(() => {
     if (hasCollisions(board, droppingShape, droppingRow, droppingColumn)) {
     //   setIsCommitting(false);
@@ -93,20 +93,28 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
     // }
     // //setUpcomingBlocks(newUpcomingBlocks);
     // setScore((prevScore) => prevScore + getPoints(numCleared));
+    // setSelectedBlockCount(prevCount => prevCount + 1);
+    
     dispatchBoardState({
       type: 'commit',
       newBoard: [...getEmptyBoard(BOARD_HEIGHT - newBoard.length), ...newBoard],
       //newBlock,
     });
+   
+    const blocksWithoutCommittedOne = upcomingBlocks.filter(block => block !== droppingBlock);
+    setUpcomingBlocks(blocksWithoutCommittedOne);
+
     // setIsCommitting(false);
   }, [
     board,
     dispatchBoardState,
+    isPlaying,
     droppingBlock,
     droppingColumn,
     droppingRow,
     droppingShape,
     upcomingBlocks,
+    numberOfBlocksOnBoard
   ]);
 
 //   const gameTick = useCallback(() => {
@@ -292,9 +300,7 @@ useEffect(() => {
     
       console.log("Selcted blocks count: " + selectedBlockCount);
 
-      if(selectedBlockCount > 2){ //ovo izbaci jer ces kad postavi trecioblik da odmah zavrsis igru
-          return; //dispatch commit
-      }
+      
 
       commitPosition();
     //   setSelectedBlockCount(selectedBlockCount +1);
@@ -314,6 +320,16 @@ useEffect(() => {
     droppingShape,
     upcomingBlocks,
 ]);
+
+//hook za kraj igre
+useEffect(() => {
+    if (numberOfBlocksOnBoard  == 3) {
+      // Perform some action if there are more than 10 blocks on the board
+      setIsPlaying(false);
+    }
+  }, [numberOfBlocksOnBoard]); 
+
+
   return {
     board: renderedBoard,
     startGame,
