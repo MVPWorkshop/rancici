@@ -95,6 +95,7 @@ canvas {
   
   .upcoming {
     display: flex;
+    flex-wrap: wrap;
     flex-direction: row-reverse;/*da uzima sledeci oblik s reda*/
     justify-content: flex-end;
     gap: 10px;

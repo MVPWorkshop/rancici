@@ -21,10 +21,10 @@ export function useTetrisBoard(): [BoardState, Dispatch<Action>] {
     boardReducer,
     {
       board: [],
-      droppingRow: 0,
-      droppingColumn: 0,
-      droppingBlock: Block.I,
-      droppingShape: SHAPES.I.shape,
+      droppingRow: -1,
+      droppingColumn: -1,
+      droppingBlock: Block.None,
+      droppingShape: SHAPES.None.shape,
       collisions: [],
       chosenBlockId: null,
       chosenBlock: null,
@@ -147,7 +147,7 @@ export function checkCollisions(
 }
 
 export function getRandomBlock(): Block {
-  const blockValues = Object.values(Block);
+  const blockValues = Object.values(Block).filter(block => block !== Block.Char && block !== Block.None);
   return blockValues[Math.floor(Math.random() * blockValues.length)] as Block;
 }
 
@@ -169,7 +169,7 @@ function rotateBlock(shape: BlockShape): BlockShape {
 }
 
 type Action = {
-  type: 'start' | 'drop' | 'commit' | 'move' | 'setChosenBlock';//start game, drop a block, commiting=saving postition of the block when it hits the bottom(kod mene je to kad user klikne na polje)
+  type: 'start' | 'drop' | 'commit' | 'move' | 'setChosenBlock'|'commitShape';//start game, drop a block, commiting=saving postition of the block when it hits the bottom(kod mene je to kad user klikne na polje)
   newBoard?: BoardShape;
   newBlock?: Block;
   isPressingLeft?: boolean;
@@ -215,7 +215,10 @@ function boardReducer(state: BoardState, action: Action): BoardState {
       //   newState.droppingRow,
       //   newState.droppingColumn
       // );
-
+      if(newState.chosenBlock == null || newState.chosenBlockId == null){
+        break;
+      }
+      console.log('case drop passed the check');
       const block = newState.chosenBlock ?? Block.None;
       newState.droppingBlock = block;
       newState.droppingShape = newState.chosenBlockShape ?? SHAPES[block].shape;
@@ -233,16 +236,28 @@ function boardReducer(state: BoardState, action: Action): BoardState {
       newState.chosenBlock = action.chosenBlock ?? Block.None;
       newState.chosenBlockId = action.chosenBlockId ?? -1;
       break;
+    case 'commitShape':
+
+      break;
     case 'commit':
+      // if(hasCollisions(
+      //       newState.board,
+      //       newState.chosenBlockShape!,
+      //       newState.droppingRow,
+      //       newState.droppingColumn //+ columnOffset
+      //     )){
+      //       break;
+      //     }
+      //podesis da se izbrise chosen block
       return {
         board: [
           ...getEmptyBoard(BOARD_HEIGHT - action.newBoard!.length),
           ...action.newBoard!,
         ],
-        droppingRow: 0,
-        droppingColumn: 3,
-        droppingBlock: action.newBlock!,
-        droppingShape: SHAPES[action.newBlock!].shape,
+        droppingRow: -1,
+        droppingColumn: -1,
+        droppingBlock: Block.None,
+        droppingShape: SHAPES[Block.None].shape,
         collisions: [],
         chosenBlockId: null,
         chosenBlock: null,

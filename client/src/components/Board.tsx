@@ -8,6 +8,7 @@ interface Props {
 }
 
 export const cellHoverEmitter = new EventEmitter(); 
+export const cellClickEmitter = new EventEmitter();
 
 function Board({ currentBoard, collidedCells }: Props) {
     // const handleMouseEnter = (rowIndex: number, colIndex: number) => {
@@ -27,7 +28,7 @@ function Board({ currentBoard, collidedCells }: Props) {
         timeoutId = setTimeout(() => {
             cellHoverEmitter.emit('cellHover', { rowIndex, colIndex }); // Emit an event with row and column indices
             timeoutId = null; // Reset the timeout ID
-        }, 200);
+        }, 100);
     };
 
     const handleMouseLeave = () => {
@@ -37,12 +38,17 @@ function Board({ currentBoard, collidedCells }: Props) {
             timeoutId = null;
         }
     };
+
+    const handleClick = (rowIndex: number, colIndex: number) => {
+        cellHoverEmitter.emit('cellClick', { rowIndex, colIndex }); 
+    }
+
     return (
         <div className="board">
             {currentBoard.map((row, rowIndex) => (
                 <div className="row" key={`${rowIndex}`}>
                     {row.map((cell, colIndex) => (
-                        <div key={`${rowIndex}-${colIndex}`} onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)} onMouseLeave={handleMouseLeave}>
+                        <div key={`${rowIndex}-${colIndex}`} onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)} onMouseLeave={handleMouseLeave} onClick={() => handleClick(rowIndex, colIndex)}>
                         <Cell type={cell}  isCollided={ collidedCells && collidedCells.some(([r, c]) => r === rowIndex && c === colIndex)}/>
                         </div>
                     ))}

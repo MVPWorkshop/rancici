@@ -7,6 +7,7 @@ import {
   BOARD_HEIGHT,
   getEmptyBoard,
   getRandomBlock,
+  getBoardWithCharBlocks,
 } from './useBoard';
 import {chosenBlockEmitter} from "../components/AvailableBlocks";
 import {cellHoverEmitter} from "../components/Board";
@@ -24,6 +25,7 @@ export function useGameLogic() {
   const [isPlaying, setIsPlaying] = useState(false); //da li je pocela igra
   const [tickSpeed, setTickSpeed] = useState<TickSpeed | null>(null); //kojom brzinom pada block
 //   const [collidedCells, setCollidedCells] = useState<[number, number][]>([]);
+const [selectedBlockCount, setSelectedBlockCount] = useState(0);
 
 
   const [
@@ -33,6 +35,13 @@ export function useGameLogic() {
 
   const startGame = useCallback(() => {
     const startingBlocks = [
+      getRandomBlock(),
+      getRandomBlock(),
+      getRandomBlock(),
+      getRandomBlock(),
+      getRandomBlock(),
+      getRandomBlock(),
+      getRandomBlock(),
       getRandomBlock(),
       getRandomBlock(),
       getRandomBlock(),
@@ -46,13 +55,17 @@ export function useGameLogic() {
   }, [dispatchBoardState]);
 
   const commitPosition = useCallback(() => {
-    if (!hasCollisions(board, droppingShape, droppingRow + 1, droppingColumn)) {
-      setIsCommitting(false);
-      setTickSpeed(TickSpeed.Normal);
+    if (hasCollisions(board, droppingShape, droppingRow, droppingColumn)) {
+    //   setIsCommitting(false);
+    //   setTickSpeed(TickSpeed.Normal);
       return;
     } //ovde proverimo da li je user otklonio onaj collision(imao je dodatno vreme za to) i ako jeste onda nastavlja da pada block
     //a za slucaj da nije, onda znaci da je block nasao svoje mesto i spreman je za commit i onda cemo da sacuvamo to stanje, to jest kako izgleda ceo board kad taj novi blok se pozicionira na njega!!!
     const newBoard = structuredClone(board) as BoardShape;
+    console.log("drop block: "+ droppingBlock);
+    console.log("drop shape: "+ droppingShape);
+    console.log("drop row: "+ droppingRow);
+    console.log("drop column: "+ droppingColumn);
     addShapeToBoard(
       newBoard,
       droppingBlock,
@@ -60,7 +73,6 @@ export function useGameLogic() {
       droppingRow,
       droppingColumn
     );
-
     let numCleared = 0;
     for (let row = BOARD_HEIGHT - 1; row >= 0; row--) {
       if (newBoard[row].every((entry) => entry !== EmptyCell.Empty)) {
@@ -69,24 +81,24 @@ export function useGameLogic() {
       }
     }
 
-    const newUpcomingBlocks = structuredClone(upcomingBlocks) as Block[];
-    const newBlock = newUpcomingBlocks.pop() as Block;
-    newUpcomingBlocks.unshift(getRandomBlock());
+    // const newUpcomingBlocks = structuredClone(upcomingBlocks) as Block[];
+    // const newBlock = newUpcomingBlocks.pop() as Block;
+    // newUpcomingBlocks.unshift(getRandomBlock());
 
-    if (hasCollisions(board, SHAPES[newBlock].shape, 0, 3)) {
-      setIsPlaying(false);
-      setTickSpeed(null);
-    } else {
-      setTickSpeed(TickSpeed.Normal);
-    }
-    //setUpcomingBlocks(newUpcomingBlocks);
-    setScore((prevScore) => prevScore + getPoints(numCleared));
+    // if (hasCollisions(board, SHAPES[newBlock].shape, 0, 3)) {
+    //   setIsPlaying(false);
+    //   setTickSpeed(null);
+    // } else {
+    //   setTickSpeed(TickSpeed.Normal);
+    // }
+    // //setUpcomingBlocks(newUpcomingBlocks);
+    // setScore((prevScore) => prevScore + getPoints(numCleared));
     dispatchBoardState({
       type: 'commit',
       newBoard: [...getEmptyBoard(BOARD_HEIGHT - newBoard.length), ...newBoard],
-      newBlock,
+      //newBlock,
     });
-    setIsCommitting(false);
+    // setIsCommitting(false);
   }, [
     board,
     dispatchBoardState,
@@ -221,6 +233,7 @@ export function useGameLogic() {
 //     blockShape: null,
 //   });
 
+//hook za lkik na AVAILABLE BLOCK
   useEffect(() => {
     const handleBlockSelection = ({ blockId, blockShape }: { blockId: number; blockShape: Block }) => {
       // Perform actions based on the selected block ID and shape
@@ -248,24 +261,11 @@ export function useGameLogic() {
     droppingShape,
     upcomingBlocks,
   ]); //treba li chosenBlock?
-
+  
+  //hook za HOVER
   useEffect(() => {
     const handleCellHover = ({ rowIndex, colIndex }: { rowIndex: number; colIndex: number }) => {
       console.log('Hovered Cell Row:', rowIndex + ' Hovered Cell Column:', colIndex);
-    //   if (chosenBlock.blockId === null || chosenBlock.blockShape === null) {
-    //     console.log("block is not chosen");
-    //     return;
-    //   }
-    //   console.log('Chosen Block ID:', chosenBlock.blockId);
-    //   console.log('Chosen Block Shape:', chosenBlock.blockShape);
-
-    //   addShapeToBoard(
-    //     renderedBoard,
-    //     chosenBlock.blockShape,
-    //     SHAPES[chosenBlock.blockShape].shape,
-    //     rowIndex,
-    //     colIndex
-    //   );
 
     dispatchBoardState({ type: 'drop', hoveredColumnIndex: colIndex, hoveredRowIndex: rowIndex});
     };
@@ -285,6 +285,35 @@ export function useGameLogic() {
     upcomingBlocks,
 ]); // [chosenBlock.blockId, chosenBlock.blockShape, chosenBlock]
 
+//hook za CELL CLICK
+useEffect(() => {
+    const handleCellClick = ({ rowIndex, colIndex }: { rowIndex: number; colIndex: number }) => {
+      console.log('Clicked Cell Row:', rowIndex + ' Clicked Cell Column:', colIndex);
+    
+      console.log("Selcted blocks count: " + selectedBlockCount);
+
+      if(selectedBlockCount > 2){ //ovo izbaci jer ces kad postavi trecioblik da odmah zavrsis igru
+          return; //dispatch commit
+      }
+
+      commitPosition();
+    //   setSelectedBlockCount(selectedBlockCount +1);
+    };
+
+    cellHoverEmitter.on('cellClick', handleCellClick);
+
+    return () => {
+      cellHoverEmitter.off('cellClick', handleCellClick);
+    };
+  }, [
+    board,
+    commitPosition,
+    droppingBlock,
+    droppingColumn,
+    droppingRow,
+    droppingShape,
+    upcomingBlocks,
+]);
   return {
     board: renderedBoard,
     startGame,
@@ -319,13 +348,23 @@ function addShapeToBoard(
   droppingRow: number,
   droppingColumn: number
 ) {
+    if (droppingBlock == Block.None || droppingShape == SHAPES.None.shape || droppingRow == -1 || droppingColumn == -1 ) {
+        return;
+      }
   droppingShape
     .filter((row) => row.some((isSet) => isSet)) //uzimamo samo one true vrednosti iz matrice bloka, jer false ne uticu na renderovanje
     .forEach((row: boolean[], rowIndex: number) => { //onda za svaki true renderujemo board na toj poziciji
       row.forEach((isSet: boolean, colIndex: number) => {
         if (isSet) {
-          board[droppingRow + rowIndex][droppingColumn + colIndex] =
-            droppingBlock;
+            const newRow = droppingRow + rowIndex;
+          const newCol = droppingColumn + colIndex;
+          if (
+            newRow < 0 || newRow >= board.length || // Check row bounds
+            newCol < 0 || newCol >= board[0].length // Check column bounds
+          ) {
+            return; // If position is out of bounds, return without modifying the board
+          }
+          board[newRow][newCol] = droppingBlock; //
         }
       });
     });
