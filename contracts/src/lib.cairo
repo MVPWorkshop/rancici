@@ -5,6 +5,7 @@ mod systems {
 mod models {
     mod battle;
     mod config;
+    mod character;
 }
 
 mod tests {
