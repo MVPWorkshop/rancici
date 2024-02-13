@@ -1,47 +1,56 @@
-import { Entity , getComponentValue, getComponentEntities} from "@dojoengine/recs";
 import { useEffect, useState } from "react";
-import "./App.css";
-import { useDojo } from "./dojo/useDojo";
-import { Account, BigNumberish, RpcProvider } from "starknet";
-import { CLIENT_RENEG_LIMIT } from "tls";
-import BattleComponent from "./Battle";
-import { battleEventEmitter } from './dojo/createSystemCalls';
-import { useComponentValue } from "@latticexyz/react";
-import Board from "./components/Board";
-import { EmptyCell } from "./types";
-import AvailableBlocks from "./components/AvailableBlocks";
-import { useGameLogic } from "./hooks/useGameLogic";
 
+import Login from "./pages/Login.tsx";
+import PreBattle from "./pages/PreBattle.tsx";
+import Battle from "./pages/Battle.tsx";
 
+import * as localStorage from "./utils/localStorage.ts";
 
-function App() {
-    const {
-        setup: {
-            systemCalls: { createBattle, joinBattle, startBattle },
-            clientComponents: { Backpack, Battle, BattleConfig, Item },
-        },
-        account,
-        masterAccount,
-        secondAccount
-    } = useDojo();
+import "./style/App.css";
 
-    const { board, startGame, isPlaying, score, upcomingBlocks, collisions } = useGameLogic();
+const App = () => {
+  const [state, setState] = useState({
+    loggedIn: false,
+    argentWallet: { address: "..." },
+    burnerWallet: {
+      address: "...",
+    },
+    page: "Login", // "Login" | "PreBattle" | "Battle"
+    pageState: {},
+  });
+  const updateState = (newState) => {
+    setState({ ...state, ...newState });
+  };
 
-    return (
-        <>
-            <h1></h1>
-            <Board currentBoard={board} collidedCells={collisions}/>
-            <div className="controls">
-        {/* <h2>Score: {score}</h2> */}
-        <h2/>
-        {isPlaying ? ( 
-          <AvailableBlocks avaliableBlocks={upcomingBlocks} />
-        ) : (
-          <button onClick={startGame}>New Game</button>
-        )}
-      </div>
-        </>
-    );
-}
+  const stateManager = {
+    state,
+    setState,
+    updateState,
+  };
+
+  useEffect(() => {
+    const loggedIn = localStorage.isLoggedIn();
+    stateManager.updateState({
+      loggedIn,
+      page: loggedIn ? "PreBattle" : "Login",
+    });
+  }, []);
+
+  return (
+    <div className="App">
+      {stateManager.state.page == "Login" ? (
+        <Login stateManager={stateManager}></Login>
+      ) : null}
+
+      {stateManager.state.page == "PreBattle" ? (
+        <PreBattle stateManager={stateManager}></PreBattle>
+      ) : null}
+
+      {stateManager.state.page == "Battle" ? (
+        <Battle stateManager={stateManager}></Battle>
+      ) : null}
+    </div>
+  );
+};
 
 export default App;

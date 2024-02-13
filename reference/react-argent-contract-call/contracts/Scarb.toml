@@ -1,0 +1,38 @@
+[package]
+cairo-version = "2.3.0"
+name = "dojo_starter"
+version = "0.5.0"
+
+[cairo]
+sierra-replace-ids = true
+
+[dependencies]
+dojo = { git = "https://github.com/dojoengine/dojo", version = "0.5.0" }
+
+[[target.dojo]]
+
+[tool.dojo]
+initializer_class_hash = "0xbeedead"
+
+[tool.dojo.env]
+#katana-local
+#rpc_url = "http://localhost:5050/"
+#account_address = "0x2d71e9c974539bb3ffb4b115e66a23d0f62a641ea66c4016e903454c8753bbc"
+#private_key = "0x33003003001800009900180300d206308b0070db00121318d17b5e6262150b"
+
+#testnet
+#get from .env
+
+world="0x4b8a05b3b265fba18d7442d521abd9d502e32684e4e6f3c15b56722e6d94103"
+
+[tool.dojo.world]
+name = "Dojo starter"
+description = "The official Dojo Starter guide, the quickest and most streamlined way to get your Dojo Autonomous World up and running. This guide will assist you with the initial setup, from cloning the repository to deploying your world."
+cover_uri = "file://assets/cover.png"
+icon_uri = "file://assets/icon.png"
+website = "https://github.com/dojoengine/dojo-starter"
+
+[tool.dojo.world.socials]
+x = "https://x.com/ohayo_dojo"
+discord = "https://discord.gg/FB2wR6uF"
+github = "https://github.com/dojoengine/dojo-starter"
