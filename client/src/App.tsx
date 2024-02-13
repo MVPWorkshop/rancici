@@ -8,6 +8,8 @@ import * as localStorage from "./utils/localStorage.ts";
 
 import "./style/App.css";
 
+const SKIP_LOGIN = true;
+
 const App = () => {
   const [state, setState] = useState({
     loggedIn: false,
@@ -15,7 +17,7 @@ const App = () => {
     burnerWallet: {
       address: "...",
     },
-    page: "Login", // "Login" | "PreBattle" | "Battle"
+    page: "PreBattle", // "Login" | "PreBattle" | "Battle"
     pageState: {},
   });
   const updateState = (newState) => {
@@ -29,6 +31,8 @@ const App = () => {
   };
 
   useEffect(() => {
+    if (SKIP_LOGIN == true) return;
+
     const loggedIn = localStorage.isLoggedIn();
     stateManager.updateState({
       loggedIn,

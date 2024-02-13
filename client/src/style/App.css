@@ -1,50 +1,136 @@
 #root {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem;
-    text-align: center;
+  /* max-width: 1280px; */
+  /* margin: 0 auto; */
+  width: 100%;
+  /* padding: 2rem; */
+  text-align: center;
+  --navbar-height: 40px;
+  --navbar-element-height: 40px;
 }
 
 .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
 }
 .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
-    filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
 @keyframes logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    a:nth-of-type(2) .logo {
-        animation: logo-spin infinite 20s linear;
-    }
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
 }
 
 .card {
-    padding: 2em;
+  padding: 2em;
 }
 
 .read-the-docs {
-    color: #888;
+  color: #888;
 }
 
 .error {
-    color: red;
+  color: red;
 }
 
 .success {
-    color: green;
+  color: green;
+}
+
+/* Navbar ------------------------------------------------------> */
+
+.Navbar {
+  padding: 5px;
+  border-bottom: 1px solid orange;
+  height: var(--navbar-height);
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0 auto;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.Navbar .Logo {
+  width: 200px;
+  height: var(--navbar-element-height);
+  cursor: pointer;
+  display: flex;
+}
+
+.Navbar .Logo img {
+  width: var(--navbar-element-height);
+  height: var(--navbar-element-height);
+}
+
+.Navbar .Logo .Text {
+  font-size: 30px;
+  line-height: var(--navbar-element-height);
+  padding-left: 3px;
+}
+.Navbar .RightSideWrapper {
+  width: 500px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.Navbar .RightSideWrapper .Argent {
+  height: var(--navbar-element-height);
+  width: 100px;
+  /* display: flex; */
+  /* justify-content: space-evenly; */
+  /* font-size: 15px; */
+  /* line-height: var(--navbar-element-height); */
+}
+
+.Navbar .RightSideWrapper .Argent img {
+  height: calc(var(--navbar-element-height) / 2);
+  width: calc(var(--navbar-element-height) / 2);
+  border-radius: 2px;
+}
+
+.Navbar .RightSideWrapper .Argent .Address {
+  /* height: var(--navbar-element-height); */
+  width: 100px;
+  /* display: flex; */
+  /* justify-content: space-evenly; */
+  /* font-size: 15px; */
+  line-height: calc(var(--navbar-element-height) / 2.4);
+  font-size: calc(var(--navbar-element-height) / 3.5);
+}
+
+.Navbar .RightSideWrapper .Dojo {
+  height: var(--navbar-element-height);
+  width: 100px;
+}
+
+.Navbar .RightSideWrapper .Dojo img {
+  height: calc(var(--navbar-element-height) / 2);
+  width: calc(var(--navbar-element-height) / 2);
+  border-radius: 2px;
+}
+
+.Navbar .RightSideWrapper .Dojo .Address {
+  /* height: var(--navbar-element-height); */
+  width: 100px;
+  /* display: flex; */
+  /* justify-content: space-evenly; */
+  /* font-size: 15px; */
+  line-height: calc(var(--navbar-element-height) / 2.4);
+  font-size: calc(var(--navbar-element-height) / 3.5);
 }
