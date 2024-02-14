@@ -11,6 +11,8 @@ trait IBattle<TContractState> {
 // dojo decorator
 #[dojo::contract]
 mod battle {
+    use dojo::components::upgradeable::upgradeable::HasComponent;
+use dojo::world::IWorld;
     use core::clone::Clone;
     use core::array::ArrayTrait;
     use super::IBattle;
@@ -18,6 +20,44 @@ mod battle {
 
     use starknet::{ContractAddress, get_caller_address, contract_address_const};
     use dojo_starter::models::{battle::{Battle, BattleStatus}, config::{BATTLE_COUNTER, BattleConfig}, character::Character};
+
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        DamageInflicted: DamageInflicted,
+        CharactedDied: CharactedDied,
+        BattleFinished: BattleFinished,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct DamageInflicted {
+        #[key]
+        battleId: u32,
+        #[key]
+        battleMove: u256,
+        attackerCharID: u32,
+        attackerCharPlayerAddr: ContractAddress,
+        inflictedCharRemainingHealth: u256,
+        inflictedCharID: u32,
+        inflictedCharPlayerAddr: ContractAddress,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct CharactedDied {
+        #[key]
+        battleID: u32,
+        #[key]
+        deadCharID: u32,
+        #[key]
+        deadCharPlayerAddr: ContractAddress,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct BattleFinished {
+        #[key]
+        battleId: u32,
+        winner: ContractAddress,
+    }
 
     // impl: implement functions specified in trait
     #[external(v0)]
@@ -213,25 +253,26 @@ mod battle {
             // Get the address of the current caller, possibly the player's address.
             let player = get_caller_address();
 
-            let mut battle = get!(world, battleId, Battle);
+            let mut battle: Battle = get!(world, battleId, Battle);
             assert(battle.started == true, 'Battle not started');
             assert(battle.status != BattleStatus::REVEAL_DONE, 'Reveal not done');
             assert(battle.player1 == battle.player2, 'Can not battle with yourself');
 
             battle.started = true;
             // load characters
-            let mut player1Character1 = get!(world, (0, battle.player1, battleId), Character);
-            let mut player1Character2 = get!(world, (1, battle.player1, battleId), Character);
-            let mut player1Character3 = get!(world, (2, battle.player1, battleId), Character);
-            let mut player1Character4 = get!(world, (3, battle.player1, battleId), Character);
-            let mut player1Character5 = get!(world, (4, battle.player1, battleId), Character);
+            let mut player1Character1: Character = get!(world, (0, battle.player1, battleId), Character);
+            let mut player1Character2: Character = get!(world, (1, battle.player1, battleId), Character);
+            let mut player1Character3: Character = get!(world, (2, battle.player1, battleId), Character);
+            let mut player1Character4: Character = get!(world, (3, battle.player1, battleId), Character);
+            let mut player1Character5: Character = get!(world, (4, battle.player1, battleId), Character);
 
-            let mut player2Character1 = get!(world, (0, battle.player2, battleId), Character);
-            let mut player2Character2 = get!(world, (1, battle.player2, battleId), Character);
-            let mut player2Character3 = get!(world, (2, battle.player2, battleId), Character);
-            let mut player2Character4 = get!(world, (3, battle.player2, battleId), Character);
-            let mut player2Character5 = get!(world, (4, battle.player2, battleId), Character);
-
+            let mut player2Character1: Character = get!(world, (0, battle.player2, battleId), Character);
+            let mut player2Character2: Character = get!(world, (1, battle.player2, battleId), Character);
+            let mut player2Character3: Character = get!(world, (2, battle.player2, battleId), Character);
+            let mut player2Character4: Character = get!(world, (3, battle.player2, battleId), Character);
+            let mut player2Character5: Character = get!(world, (4, battle.player2, battleId), Character);
+            
+            let mut battleMove: u256 = 0;
             // start battle
             loop {
                 if (player1Character1.dead == true && player1Character2.dead == true && player1Character3.dead == true && player1Character4.dead == true && player1Character5.dead == true) {
@@ -243,160 +284,210 @@ mod battle {
                     if (player2Character1.dead == false) {
                         if (player2Character1.health < player1Character5.attack - player2Character1.armor) {
                             player2Character1.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character1.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character1.health -= player1Character5.attack - player2Character1.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character1.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character1.health, inflictedCharID: player2Character1.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character2.dead == false) {
                         if (player2Character2.health < player1Character5.attack - player2Character2.armor) {
                             player2Character2.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character2.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character2.health -= player1Character5.attack - player2Character2.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character1.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character2.health, inflictedCharID: player2Character2.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character3.dead == false) {
                         if (player2Character3.health < player1Character5.attack - player2Character3.armor) {
                             player2Character3.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character3.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character3.health -= player1Character5.attack - player2Character3.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character1.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character3.health, inflictedCharID: player2Character3.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character4.dead == false) {
                         if (player2Character4.health < player1Character5.attack - player2Character4.armor) {
                             player2Character4.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character4.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character4.health -= player1Character5.attack - player2Character4.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character1.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character4.health, inflictedCharID: player2Character4.id, inflictedCharPlayerAddr: battle.player2});
                         }
-                    } else if (player2Character5.dead == false) {
+                    } else {
                         if (player2Character5.health < player1Character5.attack - player2Character5.armor) {
                             player2Character5.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character5.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character5.health -= player1Character5.attack - player2Character5.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character1.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character5.health, inflictedCharID: player2Character5.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     }
                 } else if (player1Character2.dead == false) {
                     if (player2Character1.dead == false) {
                         if (player2Character1.health < player1Character2.attack - player2Character1.armor) {
                             player2Character1.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character1.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character1.health -= player1Character2.attack - player2Character1.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character2.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character1.health, inflictedCharID: player2Character1.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character2.dead == false) {
                         if (player2Character2.health < player1Character2.attack - player2Character2.armor) {
                             player2Character2.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character2.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character2.health -= player1Character2.attack - player2Character2.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character2.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character2.health, inflictedCharID: player2Character2.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character3.dead == false) {
                         if (player2Character3.health < player1Character2.attack - player2Character3.armor) {
                             player2Character3.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character3.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character3.health -= player1Character2.attack - player2Character3.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character2.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character3.health, inflictedCharID: player2Character3.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character4.dead == false) {
                         if (player2Character4.health < player1Character2.attack - player2Character4.armor) {
                             player2Character4.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character4.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character4.health -= player1Character2.attack - player2Character4.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character2.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character4.health, inflictedCharID: player2Character4.id, inflictedCharPlayerAddr: battle.player2});
                         }
-                    } else if (player2Character5.dead == false) {
+                    } else {
                         if (player2Character5.health < player1Character2.attack - player2Character5.armor) {
                             player2Character5.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character5.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character5.health -= player1Character2.attack - player2Character5.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character2.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character5.health, inflictedCharID: player2Character5.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     }
                 } else if (player1Character3.dead == false) {
                     if (player2Character1.dead == false) {
                         if (player2Character1.health < player1Character3.attack - player2Character1.armor) {
                             player2Character1.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character1.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character1.health -= player1Character3.attack - player2Character1.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character3.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character1.health, inflictedCharID: player2Character1.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character2.dead == false) {
                         if (player2Character2.health < player1Character3.attack - player2Character2.armor) {
                             player2Character2.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character2.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character2.health -= player1Character3.attack - player2Character2.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character3.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character2.health, inflictedCharID: player2Character2.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character3.dead == false) {
                         if (player2Character3.health < player1Character3.attack - player2Character3.armor) {
                             player2Character3.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character3.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character3.health -= player1Character3.attack - player2Character3.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character3.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character3.health, inflictedCharID: player2Character3.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character4.dead == false) {
                         if (player2Character4.health < player1Character3.attack - player2Character4.armor) {
                             player2Character4.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character4.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character4.health -= player1Character3.attack - player2Character4.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character3.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character4.health, inflictedCharID: player2Character4.id, inflictedCharPlayerAddr: battle.player2});
                         }
-                    } else if (player2Character5.dead == false) {
+                    } else {
                         if (player2Character5.health < player1Character3.attack - player2Character5.armor) {
                             player2Character5.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character5.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character5.health -= player1Character3.attack - player2Character5.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character3.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character5.health, inflictedCharID: player2Character5.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     }
                 } else if (player1Character4.dead == false) {
                     if (player2Character1.dead == false) {
                         if (player2Character1.health < player1Character4.attack - player2Character1.armor) {
                             player2Character1.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character1.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character1.health -= player1Character4.attack - player2Character1.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character4.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character1.health, inflictedCharID: player2Character1.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character2.dead == false) {
                         if (player2Character2.health < player1Character4.attack - player2Character2.armor) {
                             player2Character2.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character2.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character2.health -= player1Character4.attack - player2Character2.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character4.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character2.health, inflictedCharID: player2Character2.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character3.dead == false) {
                         if (player2Character3.health < player1Character4.attack - player2Character3.armor) {
                             player2Character3.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character3.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character3.health -= player1Character4.attack - player2Character3.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character4.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character3.health, inflictedCharID: player2Character3.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character4.dead == false) {
                         if (player2Character4.health < player1Character4.attack - player2Character4.armor) {
                             player2Character4.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character4.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character4.health -= player1Character4.attack - player2Character4.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character4.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character4.health, inflictedCharID: player2Character4.id, inflictedCharPlayerAddr: battle.player2});
                         }
-                    } else if (player2Character5.dead == false) {
+                    } else {
                         if (player2Character5.health < player1Character4.attack - player2Character5.armor) {
                             player2Character5.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character5.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character5.health -= player1Character4.attack - player2Character5.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character4.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character5.health, inflictedCharID: player2Character5.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     }
                 } else {
                     if (player2Character1.dead == false) {
                         if (player2Character1.health < player1Character5.attack - player2Character1.armor) {
                             player2Character1.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character1.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character1.health -= player1Character5.attack - player2Character1.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character5.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character1.health, inflictedCharID: player2Character1.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character2.dead == false) {
                         if (player2Character2.health < player1Character5.attack - player2Character2.armor) {
                             player2Character2.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character2.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character2.health -= player1Character5.attack - player2Character2.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character5.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character2.health, inflictedCharID: player2Character2.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character3.dead == false) {
                         if (player2Character3.health < player1Character5.attack - player2Character3.armor) {
                             player2Character3.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character3.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character3.health -= player1Character5.attack - player2Character3.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character5.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character3.health, inflictedCharID: player2Character3.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     } else if (player2Character4.dead == false) {
                         if (player2Character4.health < player1Character5.attack - player2Character4.armor) {
                             player2Character4.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character4.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character4.health -= player1Character5.attack - player2Character4.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character5.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character4.health, inflictedCharID: player2Character4.id, inflictedCharPlayerAddr: battle.player2});
                         }
-                    } else if (player2Character5.dead == false) {
+                    } else {
                         if (player2Character5.health < player1Character5.attack - player2Character5.armor) {
                             player2Character5.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player2Character5.id, deadCharPlayerAddr: battle.player2});
                         } else {
                             player2Character5.health -= player1Character5.attack - player2Character5.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player1Character5.id, attackerCharPlayerAddr: battle.player1, inflictedCharRemainingHealth: player2Character5.health, inflictedCharID: player2Character5.id, inflictedCharPlayerAddr: battle.player2});
                         }
                     }
                 }
@@ -405,171 +496,221 @@ mod battle {
                     battle.winner = battle.player1;
                     break;
                 }
-
+                battleMove += 1;
                 if (player2Character1.dead == false) {
                     if (player1Character1.dead == false) {
                         if (player1Character1.health < player2Character1.attack - player1Character1.armor) {
                             player1Character1.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character1.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character1.health -= player2Character1.attack - player1Character1.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character1.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character1.health, inflictedCharID: player1Character1.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character2.dead == false) {
                         if (player1Character2.health < player2Character1.attack - player1Character2.armor) {
                             player1Character2.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character2.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character2.health -= player2Character1.attack - player1Character2.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character1.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character2.health, inflictedCharID: player1Character2.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character3.dead == false) {
                         if (player1Character3.health < player2Character1.attack - player1Character3.armor) {
                             player1Character3.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character3.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character3.health -= player2Character1.attack - player1Character3.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character1.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character3.health, inflictedCharID: player1Character3.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character4.dead == false) {
                         if (player1Character4.health < player2Character1.attack - player1Character4.armor) {
                             player1Character4.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character4.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character4.health -= player2Character1.attack - player1Character4.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character1.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character4.health, inflictedCharID: player1Character4.id, inflictedCharPlayerAddr: battle.player1});
                         }
-                    } else if (player1Character5.dead == false) {
+                    } else {
                         if (player1Character5.health < player2Character1.attack - player1Character5.armor) {
                             player1Character5.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character5.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character5.health -= player2Character1.attack - player1Character5.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character1.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character5.health, inflictedCharID: player1Character5.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     }
                 } else if (player2Character2.dead == false) {
                     if (player1Character1.dead == false) {
                         if (player1Character1.health < player2Character2.attack - player1Character1.armor) {
                             player1Character1.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character1.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character1.health -= player2Character2.attack - player1Character1.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character2.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character1.health, inflictedCharID: player1Character1.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character2.dead == false) {
                         if (player1Character2.health < player2Character2.attack - player1Character2.armor) {
                             player1Character2.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character2.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character2.health -= player2Character2.attack - player1Character2.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character2.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character2.health, inflictedCharID: player1Character2.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character3.dead == false) {
                         if (player1Character3.health < player2Character2.attack - player1Character3.armor) {
                             player1Character3.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character3.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character3.health -= player2Character2.attack - player1Character3.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character2.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character3.health, inflictedCharID: player1Character3.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character4.dead == false) {
                         if (player1Character4.health < player2Character2.attack - player1Character4.armor) {
                             player1Character4.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character4.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character4.health -= player2Character2.attack - player1Character4.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character2.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character4.health, inflictedCharID: player1Character4.id, inflictedCharPlayerAddr: battle.player1});
                         }
-                    } else if (player1Character5.dead == false) {
+                    } else {
                         if (player1Character5.health < player2Character2.attack - player1Character5.armor) {
                             player1Character5.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character5.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character5.health -= player2Character2.attack - player1Character5.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character2.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character5.health, inflictedCharID: player1Character5.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     }
                 } else if (player2Character3.dead == false) {
                     if (player1Character1.dead == false) {
                         if (player1Character1.health < player2Character3.attack - player1Character1.armor) {
                             player1Character1.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character1.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character1.health -= player2Character3.attack - player1Character1.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character3.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character1.health, inflictedCharID: player1Character1.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character2.dead == false) {
                         if (player1Character2.health < player2Character3.attack - player1Character2.armor) {
                             player1Character2.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character2.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character2.health -= player2Character3.attack - player1Character2.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character3.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character2.health, inflictedCharID: player1Character2.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character3.dead == false) {
                         if (player1Character3.health < player2Character3.attack - player1Character3.armor) {
                             player1Character3.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character3.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character3.health -= player2Character3.attack - player1Character3.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character3.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character3.health, inflictedCharID: player1Character3.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character4.dead == false) {
                         if (player1Character4.health < player2Character3.attack - player1Character4.armor) {
                             player1Character4.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character4.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character4.health -= player2Character3.attack - player1Character4.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character3.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character4.health, inflictedCharID: player1Character4.id, inflictedCharPlayerAddr: battle.player1});
                         }
-                    } else if (player1Character5.dead == false) {
+                    } else {
                         if (player1Character5.health < player2Character3.attack - player1Character5.armor) {
                             player1Character5.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character5.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character5.health -= player2Character3.attack - player1Character5.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character3.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character5.health, inflictedCharID: player1Character5.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     }
                 } else if (player2Character4.dead == false) {
                     if (player1Character1.dead == false) {
                         if (player1Character1.health < player2Character4.attack - player1Character1.armor) {
                             player1Character1.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character1.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character1.health -= player2Character4.attack - player1Character1.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character4.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character1.health, inflictedCharID: player1Character1.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character2.dead == false) {
                         if (player1Character2.health < player2Character4.attack - player1Character2.armor) {
                             player1Character2.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character2.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character2.health -= player2Character4.attack - player1Character2.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character4.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character2.health, inflictedCharID: player1Character2.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character3.dead == false) {
                         if (player1Character3.health < player2Character4.attack - player1Character3.armor) {
                             player1Character3.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character3.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character3.health -= player2Character4.attack - player1Character3.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character4.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character3.health, inflictedCharID: player1Character3.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character4.dead == false) {
                         if (player1Character4.health < player2Character4.attack - player1Character4.armor) {
                             player1Character4.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character4.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character4.health -= player2Character4.attack - player1Character4.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character4.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character4.health, inflictedCharID: player1Character4.id, inflictedCharPlayerAddr: battle.player1});
                         }
-                    } else if (player1Character5.dead == false) {
+                    } else {
                         if (player1Character5.health < player2Character4.attack - player1Character5.armor) {
                             player1Character5.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character5.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character5.health -= player2Character4.attack - player1Character5.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character4.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character5.health, inflictedCharID: player1Character5.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     }
                 } else {
                     if (player1Character1.dead == false) {
                         if (player1Character1.health < player2Character5.attack - player1Character1.armor) {
                             player1Character1.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character1.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character1.health -= player2Character5.attack - player1Character1.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character5.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character1.health, inflictedCharID: player1Character1.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character2.dead == false) {
                         if (player1Character2.health < player2Character5.attack - player1Character2.armor) {
                             player1Character2.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character2.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character2.health -= player2Character5.attack - player1Character2.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character5.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character2.health, inflictedCharID: player1Character2.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character3.dead == false) {
                         if (player1Character3.health < player2Character5.attack - player1Character3.armor) {
                             player1Character3.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character3.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character3.health -= player2Character5.attack - player1Character3.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character5.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character3.health, inflictedCharID: player1Character3.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     } else if (player1Character4.dead == false) {
                         if (player1Character4.health < player2Character5.attack - player1Character4.armor) {
                             player1Character4.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character4.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character4.health -= player2Character5.attack - player1Character4.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character5.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character4.health, inflictedCharID: player1Character4.id, inflictedCharPlayerAddr: battle.player1});
                         }
-                    } else if (player1Character5.dead == false) {
+                    } else {
                         if (player1Character5.health < player2Character5.attack - player1Character5.armor) {
                             player1Character5.dead = true;
+                            emit!(world, CharactedDied{battleID: battleId, deadCharID: player1Character5.id, deadCharPlayerAddr: battle.player1});
                         } else {
                             player1Character5.health -= player2Character5.attack - player1Character5.armor;
+                            emit!(world, DamageInflicted{battleId: battleId, battleMove: battleMove, attackerCharID: player2Character5.id, attackerCharPlayerAddr: battle.player2, inflictedCharRemainingHealth: player1Character5.health, inflictedCharID: player1Character5.id, inflictedCharPlayerAddr: battle.player1});
                         }
                     }
                 }
             };
-
-            set!(world, (battle));
+            emit!(world, BattleFinished{battleId: battleId, winner: battle.winner});
+            set!(world, (battle, player1Character1, player1Character2, player1Character3, player1Character4, player1Character5, player2Character1, player2Character2, player2Character3, player2Character4, player2Character5));
         }
     }
 }
