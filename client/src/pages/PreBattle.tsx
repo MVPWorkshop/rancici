@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import Navbar from "../components/Navbar.tsx";
+import BattleComponent from "../components/Battle.tsx";
 
 import * as utils from "../utils/index.ts";
 
@@ -14,11 +15,12 @@ const PreBattle = ({ stateManager }) => {
     <div className="PreBattle">
       <Navbar stateManager={stateManager}></Navbar>
 
-      <h3>Page: PreBattle</h3>
+      {/* <h3>Page: PreBattle</h3>
       <h3>Status: {stateManager.state.pageState.status}</h3>
       <button onClick={() => sendMove(stateManager, "full move info")}>
         Random move
-      </button>
+      </button> */}
+      <BattleComponent/>
     </div>
   );
 };

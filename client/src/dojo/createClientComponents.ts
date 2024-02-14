@@ -10,7 +10,9 @@ export function createClientComponents({
 }) {
     return {
         ...contractComponents,
-        Position: overridableComponent(contractComponents.Position),
-        Moves: overridableComponent(contractComponents.Moves),
+        Backpack: overridableComponent(contractComponents.Backpack),
+        Battle: overridableComponent(contractComponents.Battle),
+        BattleConfig: overridableComponent(contractComponents.BattleConfig),
+        Item: overridableComponent(contractComponents.Item),
     };
 }
