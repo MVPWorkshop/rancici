@@ -18,7 +18,7 @@ use dojo::world::IWorld;
     use super::IBattle;
     use core::integer::u32;
     use starknet::{ContractAddress, get_caller_address, contract_address_const};
-    use dojo_starter::models::{battle::{Battle, BattleStatus}, config::{BATTLE_COUNTER, BattleConfig}, character::Character};
+    use dojo_starter_battle::models::{battle::{Battle, BattleStatus}, config::{BATTLE_COUNTER, BattleConfig}, character::Character};
 
     #[event]
     #[derive(Drop, starknet::Event)]
