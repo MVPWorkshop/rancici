@@ -74,7 +74,7 @@
       ". game controls"
       ". stats .";
     /* grid-template-columns: repeat(3, 1fr); */
-    grid-template-columns: 120px 520px auto;
+    grid-template-columns: 140px 500px auto;
     grid-template-rows: 600px auto; 
   }
   h1 {
@@ -110,7 +110,15 @@
     
     .controls {
       grid-area: controls;
-      padding-top: 50px;
+      padding: 150px 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 30px; 
+      row-gap: 80px;
+      justify-content: center; 
+      grid-template-areas:
+      ". btn ."
+      "arrowLeft upcoming arrowRight";
     }
     
     .row {
@@ -118,11 +126,84 @@
     }
     
     .upcoming {
-      display: flex;
-      flex-wrap: wrap;
-      flex-direction: row-reverse;
-      justify-content: flex-end;
-      gap: 10px;
+      grid-area: upcoming;
+      justify-self: center;
+    }
+
+    .glow-on-hover {
+      grid-area: btn;
+      width: 220px;
+      height: 50px;
+      border: none;
+      outline: none;
+      color: #fff;
+      background: #111;
+      cursor: pointer;
+      position: relative;
+      z-index: 0;
+      border-radius: 10px;
+  }
+  
+  .glow-on-hover:before {
+      content: '';
+      background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+      position: absolute;
+      top: -2px;
+      left:-2px;
+      background-size: 400%;
+      z-index: -1;
+      filter: blur(5px);
+      width: calc(100% + 4px);
+      height: calc(100% + 4px);
+      animation: glowing 20s linear infinite;
+      opacity: 0;
+      transition: opacity .3s ease-in-out;
+      border-radius: 10px;
+  }
+  
+  .glow-on-hover:active {
+      color: #000
+  }
+  
+  .glow-on-hover:active:after {
+      background: transparent;
+  }
+  
+  .glow-on-hover:hover:before {
+      opacity: 1;
+  }
+  
+  .glow-on-hover:after {
+      z-index: -1;
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: #111;
+      left: 0;
+      top: 0;
+      border-radius: 10px;
+  }
+  
+  @keyframes glowing {
+      0% { background-position: 0 0; }
+      50% { background-position: 400% 0; }
+      100% { background-position: 0 0; }
+  }
+    .arrowLeft{
+      background-image: url('../assets/arrowleft.png');
+      background-size: cover;  
+      width: 60px;
+      aspect-ratio: 1;
+      grid-area: arrowLeft;
+      justify-self: end;
+    }
+    .arrowRight{
+      background-image: url('../assets/arrowright.png');
+      background-size: cover;  
+      width: 60px;
+      aspect-ratio: 1;
+      grid-area: arrowRight;
     }
     
     .cell {
@@ -185,7 +266,6 @@
         width: 40px;
         aspect-ratio: 1;
       }
-  
     .collision{
       border-color: red; 
     background-image: linear-gradient(45deg, lightgrey 25%, transparent 25%, transparent 75%, lightgrey 75%, lightgrey), linear-gradient(-45deg, lightgrey 25%, transparent 25%, transparent 75%, lightgrey 75%, lightgrey); /* Diagonal stripes */

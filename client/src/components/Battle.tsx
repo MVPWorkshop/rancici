@@ -34,7 +34,7 @@
 // export default BattleComponent
 
 // import { Entity , getComponentValue, getComponentEntities} from "@dojoengine/recs";
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 // import "./App.css";
 // import { useDojo } from "../dojo/useDojo";
 // import { Account, BigNumberish, RpcProvider } from "starknet";
@@ -74,28 +74,28 @@ function BattleComponent() {
     //     secondAccount
     // } = useDojo();
 
-    const { board, isPlaying, upcomingBlocks, collisions, stats } = useGameLogic();
+    const { board, isPlaying, chosenBlock, collisions, stats, setLeftBlock, setRightBlock } = useGameLogic();
 
     // const stats = generateStatsArray(5);
 
-    return (
-        <div className="game-container">
-            <h1></h1>
-            <Board currentBoard={board} collidedCells={collisions}/>
-            <div className="controls">
-        <h2/>
-        {isPlaying ? ( 
-              <AvailableBlocks avaliableBlocks={upcomingBlocks} />
-        ) : <><h1>henlooooo</h1></>}
+    function startBattle(){
+
+    }
+
+  return (
+    <div className="game-container">
+      <h1></h1>
+      <Board currentBoard={board} collidedCells={collisions} />
+      <div className="controls">
+        <h2 />
+        <div className="arrowLeft"></div>
+        <AvailableBlocks avaliableBlock={chosenBlock} />
+        <div className="arrowRight"></div>
+        <button className="glow-on-hover" onClick={startBattle}>START BATTLE</button>
       </div>
-      {/* {isPlaying ? (  */}
-               <CharStats stats={stats}/>
-               {/* ) : (
-                <button onClick={startGame}>New Game</button>
-              )
-        } */}
-      </div>
-    );
+      <CharStats stats={stats} />
+    </div>
+  );
 }
 
 export default BattleComponent
