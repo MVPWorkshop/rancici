@@ -74,7 +74,7 @@ function BattleComponent() {
     //     secondAccount
     // } = useDojo();
 
-    const { board, startGame, isPlaying, upcomingBlocks, collisions, stats } = useGameLogic();
+    const { board, isPlaying, upcomingBlocks, collisions, stats } = useGameLogic();
 
     // const stats = generateStatsArray(5);
 
@@ -86,13 +86,14 @@ function BattleComponent() {
         <h2/>
         {isPlaying ? ( 
               <AvailableBlocks avaliableBlocks={upcomingBlocks} />
-        ) : <></>}
+        ) : <><h1>henlooooo</h1></>}
       </div>
-      {isPlaying ? ( 
-               <CharStats stats={stats}/>) : (
+      {/* {isPlaying ? (  */}
+               <CharStats stats={stats}/>
+               {/* ) : (
                 <button onClick={startGame}>New Game</button>
               )
-        }
+        } */}
       </div>
     );
 }

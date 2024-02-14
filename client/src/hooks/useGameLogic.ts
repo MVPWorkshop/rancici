@@ -24,28 +24,33 @@ export function useGameLogic() {
   const [isCommitting, setIsCommitting] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [tickSpeed, setTickSpeed] = useState<TickSpeed | null>(null);
-  const [stats, setStats] = useState([
-    { charBlock: Block.Char1, health: 100, armor: 0, attack: 50, blockId: 11 },
-    { charBlock: Block.Char2, health: 100, armor: 0, attack: 50, blockId: 12 },
-    { charBlock: Block.Char3, health: 100, armor: 0, attack: 50, blockId: 13 },
-    { charBlock: Block.Char4, health: 100, armor: 0, attack: 50, blockId: 14 },
-    { charBlock: Block.Char5, health: 100, armor: 0, attack: 50, blockId: 15 }
-  ]);
+  const initialStats = [{ charBlock: Block.Char1, health: 100, armor: 0, attack: 50, blockId: 11 },
+  { charBlock: Block.Char2, health: 100, armor: 0, attack: 50, blockId: 12 },
+  { charBlock: Block.Char3, health: 100, armor: 0, attack: 50, blockId: 13 },
+  { charBlock: Block.Char4, health: 100, armor: 0, attack: 50, blockId: 14 },
+  { charBlock: Block.Char5, health: 100, armor: 0, attack: 50, blockId: 15 }];
+
+  const [stats, setStats] = useState(initialStats);
 
   const [
     { board, droppingRow, droppingColumn, droppingBlock, droppingShape, collisions, numberOfBlocksOnBoard },
     dispatchBoardState,
   ] = useTetrisBoard();
 
-  const startGame = useCallback(() => {
-    const startingBlocks = getRandomUniqueBlocks();
-    setScore(0);
-    setUpcomingBlocks(startingBlocks);
-    setIsCommitting(false);
-    setIsPlaying(true);
-    setTickSpeed(TickSpeed.Normal);
-    dispatchBoardState({ type: 'start' });
-  }, [dispatchBoardState]);
+  useEffect(() => {
+    const startGame = () => {
+      const startingBlocks = getRandomUniqueBlocks();
+      setScore(0);
+      setUpcomingBlocks(startingBlocks);
+      setIsCommitting(false);
+      setIsPlaying(true);
+      setTickSpeed(TickSpeed.Normal);
+      dispatchBoardState({ type: 'start' });
+      setStats(initialStats);
+    };
+  
+    startGame();
+  }, []);
    
   const commitPosition = useCallback(() => {
     if (hasCollisions(board, droppingShape, droppingRow, droppingColumn)) {
@@ -73,6 +78,7 @@ export function useGameLogic() {
    
     const blocksWithoutCommittedOne = upcomingBlocks.filter(block => block !== droppingBlock);
     setUpcomingBlocks(blocksWithoutCommittedOne);
+    setIsCommitting(true);
   }, [
     board,
     dispatchBoardState,
@@ -216,34 +222,38 @@ useEffect(() => {
   //hook za stats
   useEffect(() => {
     const handleBoardChange = () => {
-      const newStats = getNewStats(stats, board);
+      if(isCommitting){
+        const newStats = getNewStats(initialStats, board);
       setStats(newStats);
+      }
     };
 
     handleBoardChange();
-  }, [board]);
+
+    return () => {
+        setIsCommitting(false);
+    };
+  }, [isCommitting]);
 
   return {
     board: renderedBoard,
-    startGame,
     isPlaying,
     stats,
     upcomingBlocks,
     collisions
   };
 }
-
-function getNewStats(stats, board: BoardShape) : any{
-  let finalCharacterArray = stats;
-  let initialCharacterArray = transformBoardToArray(board);
+function getNewStats(initialStats, board: BoardShape) : any{
+  let finalCharacterArray = initialStats;
+  let arrayOfBoard = transformBoardToArray(board);
 
   for (let i = 11; i < 16; i++) {
-    let charPosition = initialCharacterArray.indexOf(i);
+    let charPosition = arrayOfBoard.indexOf(i);
     let character = finalCharacterArray.find(stat => stat.blockId === i); 
-    let leftOfCharacter = initialCharacterArray[charPosition - 1];
-    let rightOfCharacter = initialCharacterArray[charPosition + 1];
-    let upOfCharacter = initialCharacterArray[charPosition - 7];
-    let downOfCharacter = initialCharacterArray[charPosition + 7];
+    let leftOfCharacter = arrayOfBoard[charPosition - 1];
+    let rightOfCharacter = arrayOfBoard[charPosition + 1];
+    let upOfCharacter = arrayOfBoard[charPosition - 7];
+    let downOfCharacter = arrayOfBoard[charPosition + 7];
 
     if (leftOfCharacter === 2) {
       character.health += 10;
