@@ -11,6 +11,7 @@ trait IBattle<TContractState> {
 // dojo decorator
 #[dojo::contract]
 mod battle {
+    use core::clone::Clone;
     use core::array::ArrayTrait;
     use super::IBattle;
     use core::integer::u32;
@@ -60,9 +61,7 @@ mod battle {
             let player = get_caller_address();
 
             let mut battle = get!(world, battleId, Battle);
-            if (battle.status != BattleStatus::CREATED) {
-                return;
-            }
+            assert(battle.status != BattleStatus::CREATED, 'Wrong battle status');
 
             battle.player2 = player;
             battle.status = BattleStatus::AWAITING_COMMITMENT;
@@ -77,10 +76,8 @@ mod battle {
 
             let mut battle = get!(world, battleId, Battle);
 
-            if (battle.status != BattleStatus::AWAITING_COMMITMENT) {
-                return;
-            }
-
+            assert(battle.status != BattleStatus::AWAITING_COMMITMENT, 'Wrong battle status');
+            assert(battle.player1 == player || battle.player2 == player, 'Player is not in the battle');
             if (battle.player1 == player) {
                 if (battle.player2_formation_hash != 0) {
                     battle.status = BattleStatus::AWAITING_REVEAL;
@@ -91,8 +88,6 @@ mod battle {
                     battle.status = BattleStatus::AWAITING_REVEAL;
                 }
                 battle.player2_formation_hash = formationHash;
-            } else {
-                return;
             }
 
             set!(world, (battle));
@@ -107,14 +102,8 @@ mod battle {
 
             let mut battle = get!(world, battleId, Battle);
 
-            if (battle.status != BattleStatus::AWAITING_REVEAL) {
-                return;
-            }
-            // TODO check hash (if it mathces provided formation) and check random characterPositions (if correct)
-            let charLength = characterPositions.len();
-            if (charLength != 5) {
-                return;
-            }
+            assert(battle.status != BattleStatus::AWAITING_REVEAL, 'Wrong battle status');
+            assert(battle.player1 == player || battle.player2 == player, 'Player is not in the battle');
             if (battle.player1 == player) {
                 if (battle.player2_formation_revealed == true) {
                     battle.status = BattleStatus::REVEAL_DONE;
@@ -123,9 +112,30 @@ mod battle {
                 if (battle.player1_formation_revealed == true) {
                     battle.status = BattleStatus::REVEAL_DONE;
                 }
-            } else {
-                return;
             }
+
+            // TODO check hash (if it mathces provided formation) and check random characterPositions (if correct)
+            let charLength = characterPositions.len();
+            assert(charLength != 5, 'Invalid character length');
+            //check if characters in right position in formation
+            let mut i = 0;
+            let validationCharPositions = characterPositions.clone();
+            let validationFomation = formation.clone();
+            let validPositions = loop {
+                if i == 5 {
+                    break true;
+                }
+                let charPostion = *validationCharPositions.at(i);
+                if (charPostion < 0 || charPostion > 48) {
+                    break false;
+                }
+                if (*validationFomation.at(charPostion) != 1) {
+                    break false;
+                }
+                i += 1;
+            };
+
+            assert(validPositions == false, 'Invalid character positions');
 
             let mut defCharacter = Character {
                 id: 0,
@@ -144,12 +154,12 @@ mod battle {
                 if i == 5 {
                     break;
                 }
-                let charPostion = characterPositions.at(i);
+                let charPostion = *characterPositions.at(i);
                 let mut character = *initialCharacterArray.at(i);
-                let leftOfCharacter = *formation.at(*charPostion - 1);
-                let rightOfCharacter = *formation.at(*charPostion + 1);
-                let upOfCharacter = *formation.at(*charPostion - 7);
-                let downOfCharacter = *formation.at(*charPostion + 7);
+                let leftOfCharacter = *formation.at(charPostion - 1);
+                let rightOfCharacter = *formation.at(charPostion + 1);
+                let upOfCharacter = *formation.at(charPostion - 7);
+                let downOfCharacter = *formation.at(charPostion + 7);
                 if (leftOfCharacter == 2) {
                     character.health += 10;
                 } else if (leftOfCharacter == 3) {
@@ -204,15 +214,10 @@ mod battle {
             let player = get_caller_address();
 
             let mut battle = get!(world, battleId, Battle);
-            if (battle.started == true) {
-                return;
-            }
-            if (battle.status != BattleStatus::REVEAL_DONE) {
-                return;
-            }
-            if (battle.player1 == battle.player2) {
-                return;
-            }
+            assert(battle.started == true, 'Battle not started');
+            assert(battle.status != BattleStatus::REVEAL_DONE, 'Reveal not done');
+            assert(battle.player1 == battle.player2, 'Can not battle with yourself');
+
             battle.started = true;
             // load characters
             let mut player1Character1 = get!(world, (0, battle.player1, battleId), Character);
