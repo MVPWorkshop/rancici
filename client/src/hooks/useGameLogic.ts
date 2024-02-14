@@ -226,6 +226,7 @@ export function useGameLogic() {
     droppingRow,
     droppingShape,
     upcomingBlocks,
+    chosenBlock
 ]); 
 
 //hook za CELL CLICK
@@ -249,6 +250,7 @@ useEffect(() => {
     droppingRow,
     droppingShape,
     upcomingBlocks,
+    chosenBlock
 ]);
 
 // hook za kraj igre

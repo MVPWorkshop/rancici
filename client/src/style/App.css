@@ -191,15 +191,17 @@
       100% { background-position: 0 0; }
   }
     .arrowLeft{
-      background-image: url('../assets/arrowleft.png');
+      background-image: url('../assets/leftArrow2.webp');
       background-size: cover;  
       width: 60px;
       aspect-ratio: 1;
       grid-area: arrowLeft;
       justify-self: end;
+      filter: hue-rotate(340deg); 
     }
     .arrowRight{
-      background-image: url('../assets/arrowright.png');
+      background-image: url('../assets/rightArrow2.webp');
+      filter: hue-rotate(340deg); 
       background-size: cover;  
       width: 60px;
       aspect-ratio: 1;
