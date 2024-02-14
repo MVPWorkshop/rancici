@@ -15,7 +15,7 @@ const App = () => {
     burnerWallet: {
       address: "...",
     },
-    page: "Login", // "Login" | "PreBattle" | "Battle"
+    page: "PreBattle", // "Login" | "PreBattle" | "Battle"
     pageState: {},
   });
   const updateState = (newState) => {
@@ -29,11 +29,13 @@ const App = () => {
   };
 
   useEffect(() => {
-    const loggedIn = localStorage.isLoggedIn();
-    stateManager.updateState({
-      loggedIn,
-      page: loggedIn ? "PreBattle" : "Login",
-    });
+    if (state.page == "Login") {
+      const loggedIn = localStorage.isLoggedIn();
+      stateManager.updateState({
+        loggedIn,
+        page: loggedIn ? "PreBattle" : "Login",
+      });
+    }
   }, []);
 
   return (
