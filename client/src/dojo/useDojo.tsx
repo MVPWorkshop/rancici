@@ -11,6 +11,7 @@ export const useDojo = () => {
     return {
         setup: context,
         account: context.account,
-        masterAccount: context.masterAccount
+        masterAccount: context.masterAccount,
+        secondAccount: context.secAccount
     };
 };

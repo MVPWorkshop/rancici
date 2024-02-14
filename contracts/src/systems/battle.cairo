@@ -17,7 +17,6 @@ use dojo::world::IWorld;
     use core::array::ArrayTrait;
     use super::IBattle;
     use core::integer::u32;
-
     use starknet::{ContractAddress, get_caller_address, contract_address_const};
     use dojo_starter::models::{battle::{Battle, BattleStatus}, config::{BATTLE_COUNTER, BattleConfig}, character::Character};
 
@@ -712,5 +711,6 @@ use dojo::world::IWorld;
             emit!(world, BattleFinished{battleId: battleId, winner: battle.winner});
             set!(world, (battle, player1Character1, player1Character2, player1Character3, player1Character4, player1Character5, player2Character1, player2Character2, player2Character3, player2Character4, player2Character5));
         }
+        //treba li da return-ujes f-je?
     }
 }
