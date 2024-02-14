@@ -31,19 +31,37 @@ p {
 
 @keyframes ch-hit {
   0% {
-    transform: translate(0, 0) rotate(0deg);
+    transform: translate(1px, 1px) rotate(0deg);
   }
-  25% {
-    transform: translate(3px, 3px) rotate(3deg);
+  10% {
+    transform: translate(-1px, -2px) rotate(-1deg);
+  }
+  20% {
+    transform: translate(-3px, 0px) rotate(1deg);
+  }
+  30% {
+    transform: translate(3px, 2px) rotate(0deg);
+  }
+  40% {
+    transform: translate(1px, -1px) rotate(1deg);
   }
   50% {
-    transform: translate(0, 0) rotate(0eg);
+    transform: translate(-1px, 2px) rotate(-1deg);
   }
-  75% {
-    transform: translate(-3px, 3px) rotate(-3deg);
+  60% {
+    transform: translate(-3px, 1px) rotate(0deg);
+  }
+  70% {
+    transform: translate(3px, 1px) rotate(-1deg);
+  }
+  80% {
+    transform: translate(-1px, -1px) rotate(1deg);
+  }
+  90% {
+    transform: translate(1px, 2px) rotate(0deg);
   }
   100% {
-    transform: translate(0, 0) rotate(0deg);
+    transform: translate(1px, -2px) rotate(-1deg);
   }
 }
 
@@ -53,19 +71,16 @@ p {
 
 .Ch,
 .Ch-Attacker,
-.Ch-Target,
-.Ch-Target-Hit {
+.Ch-Target {
   height: 50px;
   width: 50px;
   background-color: gray;
+  opacity: 80%;
 }
 
-.Ch-Attacker {
-  background-color: blueviolet;
-}
-
+.Ch-Attacker,
 .Ch-Target {
-  background-color: black;
+  opacity: 100%;
 }
 
 .BecomingActive,
@@ -86,7 +101,7 @@ p {
 }
 
 .Ch-Target-Hit {
-  animation: ch-hit 0.3s linear;
+  animation: ch-hit 0.3s linear infinite;
 }
 
 .BecomingInactive {
@@ -117,6 +132,37 @@ p {
   filter: grayscale(100%);
 }
 
+.Grid-P-1,
+.Grid-P-2 {
+  margin-left: 50px;
+  display: flex;
+  width: 500px;
+}
+
 .Grid-P-2 {
   margin-left: 900px;
+  margin-top: 200px;
+}
+
+.P1-Ch-Info,
+.P2-Ch-Info {
+  display: flex;
+  justify-content: space-evenly;
+  width: 700px;
+}
+.TeamInfoWrapper {
+  margin-top: 200px;
+  display: flex;
+  justify-content: space-around;
+}
+.CharacterCard {
+  opacity: 0.8;
+}
+
+.ActiveCharacterCard {
+  opacity: 1;
+}
+
+.CharacterCardImg {
+  width: 100px;
 }
