@@ -1,5 +1,5 @@
 import { useReducer, Dispatch } from 'react';
-import { Block, BlockShape, BoardShape, EmptyCell, SHAPES } from '../types';
+import { Block, BlockShape, BoardShape, EmptyCell, SHAPES, CellColor } from '../types';
 
 export const BOARD_WIDTH = 7;
 export const BOARD_HEIGHT = 7;
@@ -50,6 +50,38 @@ export function getEmptyBoard(height = BOARD_HEIGHT): BoardShape {
     .map(() => Array(BOARD_WIDTH).fill(EmptyCell.Empty));
 }
 
+// export function getBoardWithCharBlocks(height = BOARD_HEIGHT, width = BOARD_HEIGHT): BoardShape {
+//   const board: BoardShape = [];
+//   const numBlocks = 5; 
+
+//   for (let i = 0; i < height; i++) {
+//     const row = Array(width).fill(EmptyCell.Empty);
+//     board.push(row);
+//   }
+
+//   // for (let i = 0; i < numBlocks; i++) {
+//   //   const randomRow = Math.floor(Math.random() * height);
+//   //   const randomCol = Math.floor(Math.random() * width);
+//   //   board[randomRow][randomCol] = Block.Char;
+//   // }
+
+//   let charBlocksPlaced = 0;
+
+//   // Place Char blocks
+//   while (charBlocksPlaced < numBlocks) {
+//     const randomRow = Math.floor(Math.random() * height);
+//     const randomCol = Math.floor(Math.random() * width);
+
+//     // Check if the cell is empty before placing the Char block
+//     if (board[randomRow][randomCol] === EmptyCell.Empty) {
+//       board[randomRow][randomCol] = Block.Char;
+//       charBlocksPlaced++;
+//     }
+//   }
+
+//   return board;
+// }
+
 export function getBoardWithCharBlocks(height = BOARD_HEIGHT, width = BOARD_HEIGHT): BoardShape {
   const board: BoardShape = [];
   const numBlocks = 5; 
@@ -59,10 +91,23 @@ export function getBoardWithCharBlocks(height = BOARD_HEIGHT, width = BOARD_HEIG
     board.push(row);
   }
 
+  const charBlocks: Block[] = Object.values(Block).filter(block => block.startsWith("Char"));
+  const placedCharBlocks: Block[] = [];
+
   for (let i = 0; i < numBlocks; i++) {
-    const randomRow = Math.floor(Math.random() * height);
-    const randomCol = Math.floor(Math.random() * width);
-    board[randomRow][randomCol] = Block.Char;
+    let randomRow: number, randomCol: number;
+    do {
+      randomRow = Math.floor(Math.random() * height);
+      randomCol = Math.floor(Math.random() * width);
+    } while (board[randomRow][randomCol] !== EmptyCell.Empty); 
+
+    const randomCharBlockIndex = Math.floor(Math.random() * charBlocks.length);
+    const charBlock = charBlocks[randomCharBlockIndex];
+
+    board[randomRow][randomCol] = charBlock;
+    placedCharBlocks.push(charBlock);
+
+    charBlocks.splice(randomCharBlockIndex, 1);
   }
 
   return board;
@@ -93,6 +138,7 @@ export function hasCollisions(
     });
   return hasCollision;
 }
+
 export function getCollisions(
   board: BoardShape,
   currentShape: BlockShape,
@@ -122,8 +168,24 @@ export function getCollisions(
 }
 
 export function getRandomBlock(): Block {
-  const blockValues = Object.values(Block).filter(block => block !== Block.Char && block !== Block.None);
+  const blockValues = Object.values(Block).filter(block => !block.startsWith("Char") && block !== Block.None);
   return blockValues[Math.floor(Math.random() * blockValues.length)] as Block;
+}
+
+export function getRandomUniqueBlocks(): Block[] {
+  const blockValues = Object.values(Block)
+    .filter(block => !block.startsWith("Char") && block !== Block.None);
+  const selectedBlocks: Block[] = [];
+
+  while (selectedBlocks.length < 10) {
+    const randomIndex = Math.floor(Math.random() * blockValues.length);
+    const randomBlock = blockValues[randomIndex];
+    if (!selectedBlocks.includes(randomBlock)) {
+      selectedBlocks.push(randomBlock);
+    }
+  }
+
+  return selectedBlocks;
 }
 
 function rotateBlock(shape: BlockShape): BlockShape {
@@ -197,10 +259,7 @@ function boardReducer(state: BoardState, action: Action): BoardState {
       break;
     case 'commit':
       return {
-        board: [
-          ...getEmptyBoard(BOARD_HEIGHT - action.newBoard!.length),
-          ...action.newBoard!,
-        ],
+        board: action.newBoard!,
         droppingRow: -1,
         droppingColumn: -1,
         droppingBlock: Block.None,

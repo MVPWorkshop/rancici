@@ -6,8 +6,8 @@ import {
   hasCollisions,
   BOARD_HEIGHT,
   getEmptyBoard,
-  getRandomBlock,
   getBoardWithCharBlocks,
+  getRandomUniqueBlocks,
 } from './useBoard';
 import {chosenBlockEmitter} from "../components/AvailableBlocks";
 import {cellHoverEmitter} from "../components/Board";
@@ -24,8 +24,13 @@ export function useGameLogic() {
   const [isCommitting, setIsCommitting] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [tickSpeed, setTickSpeed] = useState<TickSpeed | null>(null);
-const [selectedBlockCount, setSelectedBlockCount] = useState(0);
-
+  const [stats, setStats] = useState([
+    { charBlock: Block.Char1, health: 100, armor: 0, attack: 50, blockId: 11 },
+    { charBlock: Block.Char2, health: 100, armor: 0, attack: 50, blockId: 12 },
+    { charBlock: Block.Char3, health: 100, armor: 0, attack: 50, blockId: 13 },
+    { charBlock: Block.Char4, health: 100, armor: 0, attack: 50, blockId: 14 },
+    { charBlock: Block.Char5, health: 100, armor: 0, attack: 50, blockId: 15 }
+  ]);
 
   const [
     { board, droppingRow, droppingColumn, droppingBlock, droppingShape, collisions, numberOfBlocksOnBoard },
@@ -33,18 +38,7 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
   ] = useTetrisBoard();
 
   const startGame = useCallback(() => {
-    const startingBlocks = [
-      getRandomBlock(),
-      getRandomBlock(),
-      getRandomBlock(),
-      getRandomBlock(),
-      getRandomBlock(),
-      getRandomBlock(),
-      getRandomBlock(),
-      getRandomBlock(),
-      getRandomBlock(),
-      getRandomBlock(),
-    ];
+    const startingBlocks = getRandomUniqueBlocks();
     setScore(0);
     setUpcomingBlocks(startingBlocks);
     setIsCommitting(false);
@@ -71,17 +65,10 @@ const [selectedBlockCount, setSelectedBlockCount] = useState(0);
       droppingRow,
       droppingColumn
     );
-    let numCleared = 0;
-    for (let row = BOARD_HEIGHT - 1; row >= 0; row--) {
-      if (newBoard[row].every((entry) => entry !== EmptyCell.Empty)) {
-        numCleared++;
-        newBoard.splice(row, 1);
-      }
-    }
     
     dispatchBoardState({
       type: 'commit',
-      newBoard: [...getEmptyBoard(BOARD_HEIGHT - newBoard.length), ...newBoard],
+      newBoard: newBoard,
     });
    
     const blocksWithoutCommittedOne = upcomingBlocks.filter(block => block !== droppingBlock);
@@ -226,16 +213,132 @@ useEffect(() => {
     }
   }, [numberOfBlocksOnBoard]); 
 
+  //hook za stats
+  useEffect(() => {
+    const handleBoardChange = () => {
+      const newStats = getNewStats(stats, board);
+      setStats(newStats);
+    };
+
+    handleBoardChange();
+  }, [board]);
 
   return {
     board: renderedBoard,
     startGame,
     isPlaying,
-    score,
+    stats,
     upcomingBlocks,
     collisions
   };
 }
+
+function getNewStats(stats, board: BoardShape) : any{
+  let finalCharacterArray = stats;
+  let initialCharacterArray = transformBoardToArray(board);
+
+  for (let i = 11; i < 16; i++) {
+    let charPosition = initialCharacterArray.indexOf(i);
+    let character = finalCharacterArray.find(stat => stat.blockId === i); 
+    let leftOfCharacter = initialCharacterArray[charPosition - 1];
+    let rightOfCharacter = initialCharacterArray[charPosition + 1];
+    let upOfCharacter = initialCharacterArray[charPosition - 7];
+    let downOfCharacter = initialCharacterArray[charPosition + 7];
+
+    if (leftOfCharacter === 2) {
+      character.health += 10;
+    } else if (leftOfCharacter === 3) {
+      character.attack += 10;
+    } else if (leftOfCharacter === 4) {
+      character.armor += 10;
+    }
+
+    if (rightOfCharacter === 2) {
+      character.health += 10;
+    } else if (rightOfCharacter === 3) {
+      character.attack += 10;
+    } else if (rightOfCharacter === 4) {
+      character.armor += 10;
+    }
+
+    if (downOfCharacter === 2) {
+      character.health += 10;
+    } else if (downOfCharacter === 3) {
+      character.attack += 10;
+    } else if (downOfCharacter === 4) {
+      character.armor += 10;
+    }
+
+    if (upOfCharacter === 2) {
+      character.health += 10;
+    } else if (upOfCharacter === 3) {
+      character.attack += 10;
+    } else if (upOfCharacter === 4) {
+      character.armor += 10;
+    }
+
+    console.log(character);
+  }
+
+  return finalCharacterArray;
+}
+
+
+function transformBoardToArray(board: BoardShape): number[] {
+  const transformedArray: number[] = [];
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      const cell = board[i][j];
+      switch (cell) {
+        case Block.Char1:
+          transformedArray.push(11);
+          break;
+        case Block.Char2:
+          transformedArray.push(12);
+          break;
+        case Block.Char3:
+          transformedArray.push(13);
+          break;
+        case Block.Char4:
+          transformedArray.push(14);
+          break;
+        case Block.Char5:
+          transformedArray.push(15);
+          break;
+        case Block.I_R:
+        case Block.L_R:
+        case Block.O_R:
+        case Block.T_R:
+        case Block.Z_R:
+          transformedArray.push(3);
+          break;
+        case Block.I_G:
+        case Block.L_G:
+        case Block.O_G:
+        case Block.T_G:
+        case Block.Z_G:
+          transformedArray.push(2);
+          break;
+        case Block.I_B:
+        case Block.L_B:
+        case Block.O_B:
+        case Block.T_B:
+        case Block.Z_B:
+          transformedArray.push(4);
+          break;
+        case EmptyCell.Empty:
+          transformedArray.push(0);
+          break;
+        default:
+          transformedArray.push(0);
+          break;
+      }
+    }
+  }
+  return transformedArray;
+}
+
 
 function addShapeToBoard(
   board: BoardShape,
@@ -244,9 +347,9 @@ function addShapeToBoard(
   droppingRow: number,
   droppingColumn: number
 ) {
-    if (droppingBlock == Block.None || droppingShape == SHAPES.None.shape || droppingRow == -1 || droppingColumn == -1 ) {
-        return;
-      }
+    // if (droppingBlock == Block.None || droppingShape == SHAPES.None.shape || droppingRow == -1 || droppingColumn == -1 ) {
+    //     return;
+    //   }
   droppingShape
     .filter((row) => row.some((isSet) => isSet)) 
     .forEach((row: boolean[], rowIndex: number) => { 
