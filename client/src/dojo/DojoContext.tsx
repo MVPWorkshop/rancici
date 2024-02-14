@@ -10,6 +10,7 @@ import { SetupResult } from "./generated/setup";
 interface DojoContextType extends SetupResult {
     masterAccount: Account;
     account: BurnerAccount;
+    secAccount: Account
 }
 
 export const DojoContext = createContext<DojoContextType | null>(null);
@@ -25,7 +26,7 @@ export const DojoProvider = ({
     if (currentValue) throw new Error("DojoProvider can only be used once");
 
     const {
-        config: { rpcUrl, account: acc, accountClassHash },
+        config: { rpcUrl, account: acc, accountClassHash, secondAccount: secAccount },
     } = value;
 
     const rpcProvider = useMemo(
@@ -72,6 +73,7 @@ export const DojoProvider = ({
                     copyToClipboard,
                     applyFromClipboard,
                 },
+                secAccount,
             }}
         >
             {children}

@@ -31,13 +31,13 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (SKIP_LOGIN == true) return;
-
-    const loggedIn = localStorage.isLoggedIn();
-    stateManager.updateState({
-      loggedIn,
-      page: loggedIn ? "PreBattle" : "Login",
-    });
+    if (state.page == "Login") {
+      const loggedIn = localStorage.isLoggedIn();
+      stateManager.updateState({
+        loggedIn,
+        page: loggedIn ? "PreBattle" : "Login",
+      });
+    }
   }, []);
 
   return (
