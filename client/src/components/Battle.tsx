@@ -47,6 +47,7 @@ import Board from "./Board";
 import AvailableBlocks from "./AvailableBlocks";
 import { useGameLogic } from "../hooks/useGameLogic";
 import CharStats from "./CharStats";
+import * as utils from "../utils/index.ts";
 
 function generateStatsArray(numStats) {
   const statsArray = [];
@@ -63,7 +64,7 @@ function generateStatsArray(numStats) {
   return statsArray;
 }
 
-function BattleComponent({ stateManager }) {
+function BattleComponent({ stateManager, startBattle }) {
   // const {
   //     setup: {
   //         systemCalls: { createBattle, joinBattle, startBattle },
@@ -87,26 +88,64 @@ function BattleComponent({ stateManager }) {
           <div className="arrowLeft"></div>
           <AvailableBlocks avaliableBlock={chosenBlock} />
           <div className="arrowRight"></div>
-          <button className="glow-on-hover" onClick={() => startBattle()}>
+          <button
+            className="glow-on-hover"
+            onClick={async () => {
+              await sendMove(stateManager, "full_move_info...");
+              stateManager.updateState({
+                page: "Battle",
+                pageState: {},
+                board: { p1: board },
+                stats: { p1: stats },
+              });
+            }}
+          >
             START BATTLE
           </button>
         </div>
         <CharStats stats={stats} />
       </div>
-      <button
-        onClick={() => {
-          stateManager.updateState({
-            page: "Battle",
-            pageState: {},
-            board: { p1: board },
-            stats: { p1: stats },
-          });
-        }}
-      >
-        Battle
-      </button>
     </div>
   );
 }
 
 export default BattleComponent;
+
+const sendMove = async (stateManager, move) => {
+  stateManager.updateState({
+    modal: {
+      title: "Sending Transaction",
+      desc: ["..."],
+    },
+    pageState: { status: "broadcasting" },
+  });
+  await utils.delay(2100);
+
+  stateManager.updateState({
+    modal: {
+      title: "Waiting for oponnent's move",
+      desc: ["..."],
+    },
+    pageState: { status: "waiting_for_oponent" },
+  });
+  await utils.delay(1100);
+
+  stateManager.updateState({
+    modal: {
+      title: "Battle starting",
+      desc: ["..."],
+    },
+    pageState: { status: "battle_starting" },
+  });
+  await utils.delay(400);
+
+  stateManager.updateState({
+    page: "Battle",
+    pageState: {},
+    modal: {
+      title: "Battle starting",
+      desc: ["..."],
+      blinking: true,
+    },
+  });
+};

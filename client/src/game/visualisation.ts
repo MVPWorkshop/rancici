@@ -38,7 +38,7 @@ const updateClassNames = (newClassNames) => {
 export const run = async (stateManager) => {
   await init();
 
-  // const hitSound = new Audio("./sound-effects/hit.wav");
+  const hitSound = new Audio("./sound-effects/hit.wav");
 
   updateActive(getActiveChars(battleState.steps[0]));
 
@@ -59,6 +59,7 @@ export const run = async (stateManager) => {
     battleState.stageStepIdx += 1;
 
     if (battleState.missileAnimationFinished) {
+      hitSound.play();
       updateClassNames({
         target: "Ch-Target Ch-Target-Hit",
       });
@@ -71,17 +72,23 @@ export const run = async (stateManager) => {
       });
 
       await delay(1000);
-      battleState.stageStepIdx = 0;
-      const nextStepIdx = (battleState.stepIdx + 1) % battleState.steps.length;
-      battleState.stepIdx = nextStepIdx;
-      battleState.step = battleState.steps[nextStepIdx];
-      battleState.attacker = battleState.step.attacker;
-      battleState.target = battleState.step.target;
-
       updateClassNames({
         attacker: "Ch",
         target: "Ch",
       });
+      battleState.stageStepIdx = 0;
+      const nextStepIdx = battleState.stepIdx + 1;
+      battleState.finished = nextStepIdx >= battleState.steps.length;
+
+      console.log({ nextStepIdx });
+      if (battleState.finished) {
+        executeEventCallbacks("onFinish");
+        return;
+      }
+      battleState.stepIdx = nextStepIdx;
+      battleState.step = battleState.steps[nextStepIdx];
+      battleState.attacker = battleState.step.attacker;
+      battleState.target = battleState.step.target;
 
       updateActive(getActiveChars(battleState.steps[nextStepIdx]));
 
@@ -239,6 +246,7 @@ const _callbacks = {
   onStepChange: [],
   onStepStart: [],
   onBattleFinished: [],
+  onFinish: [],
 };
 export const setCallback = (e, fcn) => {
   _callbacks[e].push(fcn);

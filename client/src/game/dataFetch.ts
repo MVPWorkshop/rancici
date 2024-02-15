@@ -1,6 +1,6 @@
 import * as utils from "../utils/index.ts";
 import * as visualisation from "./visualisation.ts";
-const STEP_COUNT = 21;
+const STEP_COUNT = 2;
 
 export const run = async (stateManager, matchId) => {
   await utils.delay(400);
@@ -28,11 +28,12 @@ export const run = async (stateManager, matchId) => {
   }, 310);
 
   const steps = [];
-  for (let stepIdx = 0; stepIdx < 10; ++stepIdx) {
+  for (let stepIdx = 0; stepIdx < STEP_COUNT; ++stepIdx) {
     steps.push(randStep());
   }
 
   const battleState = {
+    finished: false,
     stepIdx: 0,
     step: steps[0],
     steps,
@@ -45,8 +46,6 @@ export const run = async (stateManager, matchId) => {
 
     missileAnimationFinished: true,
   };
-
-  console.log({ battleState });
 
   visualisation.setBattleState(battleState);
 

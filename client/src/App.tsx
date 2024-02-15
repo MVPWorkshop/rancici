@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 
 import Login from "./pages/Login.tsx";
+import PlayerMatching from "./pages/PlayerMatching.tsx";
 import PreBattle from "./pages/PreBattle.tsx";
 import Battle from "./pages/Battle.tsx";
+import Modal from "./components/Modal.tsx";
 
 import * as localStorage from "./utils/localStorage.ts";
 
 import "./style/App.css";
-
-const SKIP_LOGIN = true;
 
 const App = () => {
   const [state, setState] = useState({
@@ -17,8 +17,9 @@ const App = () => {
     burnerWallet: {
       address: "...",
     },
-    page: "PreBattle", // "Login" | "PreBattle" | "Battle"
+    page: "Login", // "Login" | "PlayerMatching" | "PreBattle" | "Battle"
     pageState: {},
+    // modal: { title: "Messaginggggg", desc: ["...", "..."] },
   });
   const updateState = (newState) => {
     setState({ ...state, ...newState });
@@ -46,6 +47,10 @@ const App = () => {
         <Login stateManager={stateManager}></Login>
       ) : null}
 
+      {stateManager.state.page == "PlayerMatching" ? (
+        <PlayerMatching stateManager={stateManager}></PlayerMatching>
+      ) : null}
+
       {stateManager.state.page == "PreBattle" ? (
         <PreBattle stateManager={stateManager}></PreBattle>
       ) : null}
@@ -53,6 +58,8 @@ const App = () => {
       {stateManager.state.page == "Battle" ? (
         <Battle stateManager={stateManager}></Battle>
       ) : null}
+
+      <Modal stateManager={stateManager}></Modal>
     </div>
   );
 };
