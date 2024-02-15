@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Block, BlockShape, BoardShape, EmptyCell, SHAPES } from '../types';
 import { useInterval } from './useInterval';
+import soundEffectFile from "../assets/click-button-140881.mp3"; 
+import commitEffectFile from "../assets/commit-sound.mp3";
 import {
   useTetrisBoard,
   hasCollisions,
@@ -19,8 +21,12 @@ enum TickSpeed {
 }
 
 export function useGameLogic() {
+  const audio = new Audio(soundEffectFile);
+  const commitAudio = new Audio(commitEffectFile);
+
   const [score, setScore] = useState(0);
   const [upcomingBlocks, setUpcomingBlocks] = useState<Block[]>([]);
+  const [upcomingBlock, setUpcomingBlock] = useState<Block>();
   const [isCommitting, setIsCommitting] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [tickSpeed, setTickSpeed] = useState<TickSpeed | null>(null);
@@ -29,11 +35,12 @@ export function useGameLogic() {
   { charBlock: Block.Char3, health: 100, armor: 0, attack: 50, blockId: 13 },
   { charBlock: Block.Char4, health: 100, armor: 0, attack: 50, blockId: 14 },
   { charBlock: Block.Char5, health: 100, armor: 0, attack: 50, blockId: 15 }];
+    const newUpcomingBlocks = structuredClone(upcomingBlocks) as Block[];
 
   const [stats, setStats] = useState(initialStats);
 
   const [
-    { board, droppingRow, droppingColumn, droppingBlock, droppingShape, collisions, numberOfBlocksOnBoard },
+    { board, droppingRow, droppingColumn, droppingBlock, droppingShape, collisions, numberOfBlocksOnBoard, chosenBlock },
     dispatchBoardState,
   ] = useTetrisBoard();
 
@@ -45,14 +52,23 @@ export function useGameLogic() {
       setIsCommitting(false);
       setIsPlaying(true);
       setTickSpeed(TickSpeed.Normal);
-      dispatchBoardState({ type: 'start' });
+      dispatchBoardState({ type: 'start', chosenBlock: startingBlocks[0]});
       setStats(initialStats);
     };
   
     startGame();
   }, []);
-   
+
+  const setLeftBlock = () => {
+    console.log('move left');
+  }
+  const setRightBlock = () => {
+    console.log('move right');
+  }
+  
+  
   const commitPosition = useCallback(() => {
+    console.log("you entered commitPosition");
     if (hasCollisions(board, droppingShape, droppingRow, droppingColumn)) {
       return;
     } 
@@ -70,14 +86,17 @@ export function useGameLogic() {
       droppingRow,
       droppingColumn
     );
-    
+    const blocksWithoutCommittedOne = upcomingBlocks.filter(block => block !== chosenBlock);
+    setUpcomingBlocks(blocksWithoutCommittedOne);
+    const newChosenBlock = blocksWithoutCommittedOne[0];
+
     dispatchBoardState({
       type: 'commit',
       newBoard: newBoard,
+      chosenBlock: newChosenBlock
     });
    
-    const blocksWithoutCommittedOne = upcomingBlocks.filter(block => block !== droppingBlock);
-    setUpcomingBlocks(blocksWithoutCommittedOne);
+    commitAudio.play();
     setIsCommitting(true);
   }, [
     board,
@@ -88,7 +107,8 @@ export function useGameLogic() {
     droppingRow,
     droppingShape,
     upcomingBlocks,
-    numberOfBlocksOnBoard
+    numberOfBlocksOnBoard,
+    chosenBlock
   ]);
 
   useEffect(() => {
@@ -99,13 +119,19 @@ export function useGameLogic() {
     let isPressingLeft = false;
     let isPressingRight = false;
 
+   
+        console.log("upcoming blocks: "+ upcomingBlocks);
+        // console.log("newupcoming blocks: "+ newUpcomingBlocks);
+        let newBlock: Block;
+        let indexofChosenBlock = chosenBlock !== Block.None ? upcomingBlocks.indexOf(chosenBlock) : 0;
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) {
         return;
       }
 
       if (event.key === 'ArrowDown') {
-        setTickSpeed(TickSpeed.Fast);
+        // setTickSpeed(TickSpeed.Fast);
       }
 
       if (event.key === 'ArrowUp') {
@@ -117,11 +143,23 @@ export function useGameLogic() {
       }
 
       if (event.key === 'ArrowLeft') {
+        audio.play();
         isPressingLeft = true;
+        const newIndex = indexofChosenBlock === 0 ? newUpcomingBlocks.length - 1 : indexofChosenBlock - 1;
+
+        newBlock = upcomingBlocks[newIndex];
+
+        dispatchBoardState({type: 'drop', chosenBlock: newBlock});
       }
 
       if (event.key === 'ArrowRight') {
+        audio.play();
         isPressingRight = true;
+        const newIndex = indexofChosenBlock === newUpcomingBlocks.length - 1 ? 0 : indexofChosenBlock + 1;
+
+        newBlock = upcomingBlocks[newIndex];
+
+        dispatchBoardState({type: 'drop', chosenBlock: newBlock});
       }
     };
 
@@ -129,7 +167,7 @@ export function useGameLogic() {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [dispatchBoardState]);
+  }, [dispatchBoardState, upcomingBlocks, chosenBlock]);
 
   const renderedBoard = structuredClone(board) as BoardShape; 
   if (isPlaying) {
@@ -142,7 +180,7 @@ export function useGameLogic() {
     );
   }
 
-//hook za lkik na AVAILABLE BLOCK
+//hook za lkik na AVAILABLE BLOCK  : OVAJ HOOK MI NVISE NE TREBA PROVERI
   useEffect(() => {
     const handleBlockSelection = ({ blockId, blockShape }: { blockId: number; blockShape: Block }) => {
       console.log('Selected Block ID:', blockId);
@@ -164,6 +202,7 @@ export function useGameLogic() {
     droppingRow,
     droppingShape,
     upcomingBlocks,
+    chosenBlock
   ]); 
   
   //hook za HOVER
@@ -187,6 +226,7 @@ export function useGameLogic() {
     droppingRow,
     droppingShape,
     upcomingBlocks,
+    chosenBlock
 ]); 
 
 //hook za CELL CLICK
@@ -210,11 +250,12 @@ useEffect(() => {
     droppingRow,
     droppingShape,
     upcomingBlocks,
+    chosenBlock
 ]);
 
-//hook za kraj igre
+// hook za kraj igre
 useEffect(() => {
-    if (numberOfBlocksOnBoard  == 3) {
+    if (numberOfBlocksOnBoard  == 10) {
       setIsPlaying(false);
     }
   }, [numberOfBlocksOnBoard]); 
@@ -239,10 +280,13 @@ useEffect(() => {
     board: renderedBoard,
     isPlaying,
     stats,
-    upcomingBlocks,
-    collisions
+    chosenBlock,
+    collisions,
+    setLeftBlock,
+    setRightBlock
   };
 }
+
 function getNewStats(initialStats, board: BoardShape) : any{
   let finalCharacterArray = initialStats;
   let arrayOfBoard = transformBoardToArray(board);

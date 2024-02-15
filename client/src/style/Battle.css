@@ -94,6 +94,7 @@ p {
   -moz-transform: scale(1.3);
   -o-transform: scale(1.3);
   transform: scale(1.3);
+  opacity: 1;
 }
 
 .Attacking {
@@ -114,6 +115,11 @@ p {
   -moz-transform: scale(1);
   -o-transform: scale(1);
   transform: scale(1);
+}
+
+.Container1 {
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .ChImg {
@@ -156,13 +162,22 @@ p {
   justify-content: space-around;
 }
 .CharacterCard {
-  opacity: 0.8;
+  /* opacity: 0.8; */
 }
 
 .ActiveCharacterCard {
   opacity: 1;
+  border: 20px solid red;
 }
 
 .CharacterCardImg {
+  width: 70px;
+}
+
+.CharacterCardWrapper {
   width: 100px;
+}
+
+.BattleVisualisation {
+  animation: fadeIn 1s;
 }

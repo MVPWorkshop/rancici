@@ -9,19 +9,48 @@ export const setBattleState = (bs) => {
   battleState = bs;
 };
 
-export const run = async (stateManager) => {
-  console.log("vis:run", { battleState });
+let attacker, target;
+let attackerCard, targetCard;
+let prefixes = { attacker: "", target: "", attackerCard: "", targetCard: "" };
+const updateActive = (newActive) => {
+  attacker = newActive.attacker;
+  target = newActive.target;
+  attackerCard = newActive.attackerCard;
+  targetCard = newActive.targetCard;
 
+  prefixes.attacker = attacker.className + " ";
+  prefixes.target = target.className + " ";
+  prefixes.attackerCard = attackerCard.className + " ";
+  prefixes.targetCard = targetCard.className + " ";
+};
+
+const updateClassNames = (newClassNames) => {
+  if (newClassNames.attacker != null) {
+    attacker.className = prefixes.attacker + newClassNames.attacker;
+    attackerCard.className = prefixes.attackerCard + newClassNames.attacker;
+  }
+  if (newClassNames.target != null) {
+    target.className = prefixes.target + newClassNames.target;
+    targetCard.className = prefixes.targetCard + newClassNames.target;
+  }
+};
+
+export const run = async (stateManager) => {
   await init();
 
-  // const hitSound = new Audio("./sound-effects/hit.wav");
+  const hitSound = new Audio("./sound-effects/hit.wav");
 
-  let { attacker, target } = getActiveChars(battleState.steps[0]);
+  updateActive(getActiveChars(battleState.steps[0]));
 
   while (true) {
     if (battleState.stageStepIdx == 0) {
-      attacker.className = "Ch-Attacker BecomingActive";
-      target.className = "Ch-Target BecomingActive";
+      executeEventCallbacks("onStepStart");
+
+      updateClassNames({
+        attacker: "Ch-Attacker BecomingActive",
+        target: "Ch-Target BecomingActive",
+      });
+
       await delay(1000);
     }
     await animateMissileTrajectory();
@@ -30,27 +59,39 @@ export const run = async (stateManager) => {
     battleState.stageStepIdx += 1;
 
     if (battleState.missileAnimationFinished) {
-      target.className = "Ch-Target Ch-Target-Hit";
+      hitSound.play();
+      updateClassNames({
+        target: "Ch-Target Ch-Target-Hit",
+      });
     }
 
     if (battleState.missileAnimationFinished && battleState.stageStepIdx > 60) {
-      attacker.className = "Ch-Attacker BecomingInactive";
-      target.className = "Ch-Target BecomingInactive";
-      executeEventCallbacks("onStepChange");
+      updateClassNames({
+        attacker: "Ch-Attacker BecomingInactive",
+        target: "Ch-Target BecomingInactive",
+      });
+
       await delay(1000);
+      updateClassNames({
+        attacker: "Ch",
+        target: "Ch",
+      });
       battleState.stageStepIdx = 0;
-      const nextStepIdx = (battleState.stepIdx + 1) % battleState.steps.length;
+      const nextStepIdx = battleState.stepIdx + 1;
+      battleState.finished = nextStepIdx >= battleState.steps.length;
+
+      console.log({ nextStepIdx });
+      if (battleState.finished) {
+        executeEventCallbacks("onFinish");
+        return;
+      }
       battleState.stepIdx = nextStepIdx;
       battleState.step = battleState.steps[nextStepIdx];
-      battleState.attacker = battleState.steps[nextStepIdx].attacker;
-      battleState.target = battleState.steps[nextStepIdx].target;
+      battleState.attacker = battleState.step.attacker;
+      battleState.target = battleState.step.target;
 
-      attacker.className = "Ch";
-      target.className = "Ch";
+      updateActive(getActiveChars(battleState.steps[nextStepIdx]));
 
-      const nextActiveChars = getActiveChars(battleState.steps[nextStepIdx]);
-      attacker = nextActiveChars.attacker;
-      target = nextActiveChars.target;
       await delay(500);
     }
   }
@@ -89,7 +130,7 @@ const setCharObject = (pIdx, chIdx, obj) => {
 };
 
 const _genCharObjectKey = (pIdx, chIdx) => {
-  return `Rancici-P-${pIdx}-Ch-${chIdx}`;
+  return `P-${pIdx}-Ch-${chIdx}`;
 };
 
 const animateMissileTrajectory = async () => {
@@ -192,12 +233,20 @@ const getActiveChars = (step) => {
   return {
     attacker: getCharObject(step.attacker.pIdx, step.attacker.chIdx),
     target: getCharObject(step.target.pIdx, step.target.chIdx),
+    attackerCard: document.getElementById(
+      `CharacterCard-P-${step.attacker.pIdx}-Ch-${step.attacker.chIdx}`
+    ),
+    targetCard: document.getElementById(
+      `CharacterCard-P-${step.target.pIdx}-Ch-${step.target.chIdx}`
+    ),
   };
 };
 
 const _callbacks = {
   onStepChange: [],
+  onStepStart: [],
   onBattleFinished: [],
+  onFinish: [],
 };
 export const setCallback = (e, fcn) => {
   _callbacks[e].push(fcn);
