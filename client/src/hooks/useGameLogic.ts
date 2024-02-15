@@ -3,8 +3,9 @@ import { Block, BlockShape, BoardShape, EmptyCell, SHAPES } from '../types';
 import { useInterval } from './useInterval';
 import soundEffectFile from "../assets/click-button-140881.mp3"; 
 import commitEffectFile from "../assets/commit-sound.mp3";
+import rotateEffectFile from "../assets/218453-ICE_Skate_scrape_one_leg_rotate_10.wav";
 import {
-  useTetrisBoard,
+  useBoard,
   hasCollisions,
   BOARD_HEIGHT,
   getEmptyBoard,
@@ -13,6 +14,7 @@ import {
 } from './useBoard';
 import {chosenBlockEmitter} from "../components/AvailableBlocks";
 import {cellHoverEmitter} from "../components/Board";
+import {stopPlayingClickEmitter} from "../components/Battle";
 
 enum TickSpeed {
   Normal = 800,
@@ -23,7 +25,7 @@ enum TickSpeed {
 export function useGameLogic() {
   const audio = new Audio(soundEffectFile);
   const commitAudio = new Audio(commitEffectFile);
-
+  const rotateAudio = new Audio(rotateEffectFile);
   const [score, setScore] = useState(0);
   const [upcomingBlocks, setUpcomingBlocks] = useState<Block[]>([]);
   const [upcomingBlock, setUpcomingBlock] = useState<Block>();
@@ -35,14 +37,14 @@ export function useGameLogic() {
   { charBlock: Block.Char3, health: 100, armor: 0, attack: 50, blockId: 13 },
   { charBlock: Block.Char4, health: 100, armor: 0, attack: 50, blockId: 14 },
   { charBlock: Block.Char5, health: 100, armor: 0, attack: 50, blockId: 15 }];
-    const newUpcomingBlocks = structuredClone(upcomingBlocks) as Block[];
+  const newUpcomingBlocks = structuredClone(upcomingBlocks) as Block[];
 
   const [stats, setStats] = useState(initialStats);
 
   const [
     { board, droppingRow, droppingColumn, droppingBlock, droppingShape, collisions, numberOfBlocksOnBoard, chosenBlock },
     dispatchBoardState,
-  ] = useTetrisBoard();
+  ] = useBoard();
 
   useEffect(() => {
     const startGame = () => {
@@ -74,10 +76,10 @@ export function useGameLogic() {
     } 
     const newBoard = structuredClone(board) as BoardShape;
 
-    console.log("drop block: "+ droppingBlock);
-    console.log("drop shape: "+ droppingShape);
-    console.log("drop row: "+ droppingRow);
-    console.log("drop column: "+ droppingColumn);
+    // console.log("drop block: "+ droppingBlock);
+    // console.log("drop shape: "+ droppingShape);
+    // console.log("drop row: "+ droppingRow);
+    // console.log("drop column: "+ droppingColumn);
 
     addShapeToBoard(
       newBoard,
@@ -112,9 +114,9 @@ export function useGameLogic() {
   ]);
 
   useEffect(() => {
-    // if (!isPlaying) {
-    //   return;
-    // }
+    if (!isPlaying) {
+      return;
+    }
 
     let isPressingLeft = false;
     let isPressingRight = false;
@@ -135,7 +137,7 @@ export function useGameLogic() {
       }
 
       if (event.key === 'ArrowUp') {
-        console.log("up pressed");
+        rotateAudio.play();
         dispatchBoardState({
           type: 'move',
           isRotating: true,
@@ -255,10 +257,17 @@ useEffect(() => {
 
 // hook za kraj igre
 useEffect(() => {
-    if (numberOfBlocksOnBoard  == 10) {
-      setIsPlaying(false);
-    }
-  }, [numberOfBlocksOnBoard]); 
+  const handleStopPLaying = () =>{
+    setIsPlaying(false);
+    console.log('stop playing');
+    dispatchBoardState({type: 'stop'});
+  }
+  stopPlayingClickEmitter.on('stopPlay', handleStopPLaying);
+
+    return () => {
+      stopPlayingClickEmitter.off('cellClick', handleStopPLaying);
+    };
+  }, [isPlaying]); 
 
   //hook za stats
   useEffect(() => {
@@ -298,37 +307,41 @@ function getNewStats(initialStats, board: BoardShape) : any{
     let rightOfCharacter = arrayOfBoard[charPosition + 1];
     let upOfCharacter = arrayOfBoard[charPosition - 7];
     let downOfCharacter = arrayOfBoard[charPosition + 7];
-
+    // console.log("char pos:"+charPosition);
+    // console.log("left pos:"+leftOfCharacter);
+    // console.log("right pos:"+rightOfCharacter);
+    // console.log("up pos:"+upOfCharacter);
+    // console.log("down pos:"+downOfCharacter);
     if (leftOfCharacter === 2) {
-      character.health += 10;
+      character.health += 30;
     } else if (leftOfCharacter === 3) {
-      character.attack += 10;
+      character.attack += 20;
     } else if (leftOfCharacter === 4) {
-      character.armor += 10;
+      character.armor += 15;
     }
 
     if (rightOfCharacter === 2) {
-      character.health += 10;
+      character.health += 30;
     } else if (rightOfCharacter === 3) {
-      character.attack += 10;
+      character.attack += 20;
     } else if (rightOfCharacter === 4) {
-      character.armor += 10;
+      character.armor += 15;
     }
 
     if (downOfCharacter === 2) {
-      character.health += 10;
+      character.health += 30;
     } else if (downOfCharacter === 3) {
-      character.attack += 10;
+      character.attack += 20;
     } else if (downOfCharacter === 4) {
-      character.armor += 10;
+      character.armor += 15;
     }
 
     if (upOfCharacter === 2) {
-      character.health += 10;
+      character.health += 30;
     } else if (upOfCharacter === 3) {
-      character.attack += 10;
+      character.attack += 20;
     } else if (upOfCharacter === 4) {
-      character.armor += 10;
+      character.armor += 15;
     }
 
     console.log(character);

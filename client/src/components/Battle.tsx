@@ -43,25 +43,16 @@ import { useEffect, useState } from "react";
 // import { battleEventEmitter } from '../dojo/createSystemCalls';
 // import { useComponentValue } from "@latticexyz/react";
 import Board from "./Board";
-// import { EmptyCell } from "../types";
+// import { EmptyCell } 
 import AvailableBlocks from "./AvailableBlocks";
 import { useGameLogic } from "../hooks/useGameLogic";
 import CharStats from "./CharStats";
+import { PreBattleState } from "../types";
+import { start } from "repl";
+import Legend from "../components/Legend";
+import { EventEmitter } from 'events';
 
-function generateStatsArray(numStats) {
-  const statsArray = [];
-
-  for (let i = 0; i < numStats; i++) {
-    const stat = {
-      Health: Math.floor(Math.random() * 100) + 1, 
-      Armor: Math.floor(Math.random() * 50) + 1,  
-      Stamina: Math.floor(Math.random() * 200) + 1 
-    };
-    statsArray.push(stat);
-  }
-
-  return statsArray;
-}
+export const stopPlayingClickEmitter = new EventEmitter();
 
 function BattleComponent({startBattle}) {
     // const {
@@ -74,18 +65,45 @@ function BattleComponent({startBattle}) {
     //     secondAccount
     // } = useDojo();
 
-    const { board, isPlaying, chosenBlock, collisions, stats, setLeftBlock, setRightBlock } = useGameLogic();
+    const [state, setState] = useState(PreBattleState.Ready_To_Commit);
 
+    const handleClick = () => {
+      switch(state){
+        case PreBattleState.Ready_To_Commit:
+          console.log('enter case');
+          stopPlayingClickEmitter.emit('stopPlay');
+          setState(PreBattleState.Commited);
+          //commit f-ja
+          break;
+        case PreBattleState.Commited:
+          setState(PreBattleState.Revealed);
+          //reveal f-ja
+          break;
+        case PreBattleState.Revealed:
+          startBattle();
+          console.log('game started');
+          break;
+      }
+     
+    };
+
+
+    const { board, isPlaying, chosenBlock, collisions, stats, setLeftBlock, setRightBlock } = useGameLogic();
+console.log(isPlaying);
   return (
     <div className="game-container">
-      <h1></h1>
+      <Legend/>
       <Board currentBoard={board} collidedCells={collisions} />
       <div className="controls">
         <h2 />
+        {isPlaying ? (
+          <>
         <div className="arrowLeft"></div>
         <AvailableBlocks avaliableBlock={chosenBlock} />
         <div className="arrowRight"></div>
-        <button className="glow-on-hover" onClick={() => startBattle()}>START BATTLE</button>
+        </>
+        ) : <></>}
+        <div className="btn-container"><button className="glow-on-hover" onClick={handleClick}>{state}</button></div>
       </div>
       <CharStats stats={stats} />
     </div>

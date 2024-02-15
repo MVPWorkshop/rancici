@@ -17,7 +17,7 @@ type BoardState = {
   numberOfBlocksOnBoard: number;
 };
 
-export function useTetrisBoard(): [BoardState, Dispatch<Action>] {
+export function useBoard(): [BoardState, Dispatch<Action>] {
   const [boardState, dispatchBoardState] = useReducer(
     boardReducer,
     {
@@ -206,7 +206,7 @@ function rotateBlock(shape: BlockShape): BlockShape {
 }
 
 type Action = {
-  type: 'start' | 'drop' | 'commit' | 'move' | 'setChosenBlock';
+  type: 'start' | 'drop' | 'commit' | 'move' | 'setChosenBlock' | 'stop';
   newBoard?: BoardShape;
   newBlock?: Block;
   isPressingLeft?: boolean;
@@ -290,6 +290,20 @@ function boardReducer(state: BoardState, action: Action): BoardState {
           rotatedShape,
           newState.droppingRow,
           newState.droppingColumn);
+      break;
+    case 'stop':
+      return {
+        board: newState.board!,
+        droppingRow: -1,
+        droppingColumn: -1,
+        droppingBlock: Block.None,
+        droppingShape: SHAPES[Block.None].shape,
+        collisions: [],
+        chosenBlockId: null,
+        chosenBlock: Block.None,//newState.chosenBlock,
+        chosenBlockShape:SHAPES[Block.None].shape, //SHAPES[newState.chosenBlock].shape,
+        numberOfBlocksOnBoard: newState.numberOfBlocksOnBoard,
+      };
       break;
     default:
       const unhandledType: never = action.type;
