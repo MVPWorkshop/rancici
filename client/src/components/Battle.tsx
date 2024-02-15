@@ -20,11 +20,11 @@
 //           return { status: 'created', color: 'blue' };
 //       }
 //   };
-  
+
 //     return (
 //       <div>
 //         <p onClick={handleClick}>
-//             Battle with id: <span style={{ color: getStatus().color }}>{battleId}</span> 
+//             Battle with id: <span style={{ color: getStatus().color }}>{battleId}</span>
 //             , status: <span style={{ color: getStatus().color }}>{getStatus().status}</span>
 //         </p>
 //       </div>
@@ -53,9 +53,9 @@ function generateStatsArray(numStats) {
 
   for (let i = 0; i < numStats; i++) {
     const stat = {
-      Health: Math.floor(Math.random() * 100) + 1, 
-      Armor: Math.floor(Math.random() * 50) + 1,  
-      Stamina: Math.floor(Math.random() * 200) + 1 
+      Health: Math.floor(Math.random() * 100) + 1,
+      Armor: Math.floor(Math.random() * 50) + 1,
+      Stamina: Math.floor(Math.random() * 200) + 1,
     };
     statsArray.push(stat);
   }
@@ -63,33 +63,50 @@ function generateStatsArray(numStats) {
   return statsArray;
 }
 
-function BattleComponent({startBattle}) {
-    // const {
-    //     setup: {
-    //         systemCalls: { createBattle, joinBattle, startBattle },
-    //         clientComponents: { Backpack, Battle, BattleConfig, Item },
-    //     },
-    //     account,
-    //     masterAccount,
-    //     secondAccount
-    // } = useDojo();
+function BattleComponent({ stateManager }) {
+  // const {
+  //     setup: {
+  //         systemCalls: { createBattle, joinBattle, startBattle },
+  //         clientComponents: { Backpack, Battle, BattleConfig, Item },
+  //     },
+  //     account,
+  //     masterAccount,
+  //     secondAccount
+  // } = useDojo();
 
-    const { board, isPlaying, chosenBlock, collisions, stats, setLeftBlock, setRightBlock } = useGameLogic();
+  const { board, isPlaying, upcomingBlocks, collisions, stats, chosenBlock } =
+    useGameLogic();
 
   return (
-    <div className="game-container">
-      <h1></h1>
-      <Board currentBoard={board} collidedCells={collisions} />
-      <div className="controls">
-        <h2 />
-        <div className="arrowLeft"></div>
-        <AvailableBlocks avaliableBlock={chosenBlock} />
-        <div className="arrowRight"></div>
-        <button className="glow-on-hover" onClick={() => startBattle()}>START BATTLE</button>
+    <div className="game-container-wrapper">
+      <div className="game-container">
+        <h1></h1>
+        <Board currentBoard={board} collidedCells={collisions} />
+        <div className="controls">
+          <h2 />
+          <div className="arrowLeft"></div>
+          <AvailableBlocks avaliableBlock={chosenBlock} />
+          <div className="arrowRight"></div>
+          <button className="glow-on-hover" onClick={() => startBattle()}>
+            START BATTLE
+          </button>
+        </div>
+        <CharStats stats={stats} />
       </div>
-      <CharStats stats={stats} />
+      <button
+        onClick={() => {
+          stateManager.updateState({
+            page: "Battle",
+            pageState: {},
+            board: { p1: board },
+            stats: { p1: stats },
+          });
+        }}
+      >
+        Battle
+      </button>
     </div>
   );
 }
 
-export default BattleComponent
+export default BattleComponent;

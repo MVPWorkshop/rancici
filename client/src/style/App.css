@@ -1,43 +1,16 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2px 2rem;
   text-align: center;
   height: 100%;
   --navbar-height: 40px;
   --navbar-element-height: 40px;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
 }
 
 .button-style {
@@ -80,9 +53,11 @@
   margin: 0 auto;
   padding-left: 10px;
   padding-right: 10px;
+  margin-bottom: 50px;
 }
 
 .Navbar .Logo {
+  font-family: "MyWebFont";
   width: 200px;
   height: var(--navbar-element-height);
   cursor: pointer;
@@ -152,207 +127,377 @@
 }
 
 .game-container {
-    display: grid;
-    grid-template-areas:
-      ". game controls"
-      ". stats .";
-    /* grid-template-columns: repeat(3, 1fr); */
-    grid-template-columns: 140px 500px auto;
-    grid-template-rows: 600px auto; 
-  }
-  h1 {
-    text-align: center;
-    grid-area: title;
-  }
-  
-  .char-stats {
-    grid-area: stats;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr); 
-    gap: 40px; 
-    justify-content: center; 
-    grid-column-start: 1; 
-    grid-column-end: 4; 
-    padding: 0 100px;
-  }
-  
-  .char-stat {
-    width: 100%; 
-    text-align: center; 
-    font-size: 15px;
-    border: 1px solid black;
-  }
-  
+  display: grid;
+  grid-template-areas:
+    ". game controls"
+    ". stats .";
+  /* grid-template-columns: repeat(3, 1fr); */
+  grid-template-columns: 140px 500px auto;
+  grid-template-rows: 600px auto;
+}
+h1 {
+  text-align: center;
+  grid-area: title;
+}
 
-  .board {
-      border: 2px solid black;
-      user-select: none;
-      margin: auto;
-      grid-area: game;
-    }
-    
-    .controls {
-      grid-area: controls;
-      padding: 150px 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr); 
-      gap: 30px; 
-      row-gap: 80px;
-      justify-content: center; 
-      grid-template-areas:
-      ". btn ."
-      "arrowLeft upcoming arrowRight";
-    }
-    
-    .row {
-      display: flex;
-    }
-    
-    .upcoming {
-      grid-area: upcoming;
-      justify-self: center;
-    }
+.char-stats {
+  grid-area: stats;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 40px;
+  justify-content: center;
+  grid-column-start: 1;
+  grid-column-end: 4;
+  padding: 0 100px;
+}
 
-    .glow-on-hover {
-      grid-area: btn;
-      width: 220px;
-      height: 50px;
-      border: none;
-      outline: none;
-      color: #fff;
-      background: #111;
-      cursor: pointer;
-      position: relative;
-      z-index: 0;
-      border-radius: 10px;
+.char-stat {
+  width: 100%;
+  text-align: center;
+  font-size: 15px;
+  border: 1px solid black;
+}
+
+.board {
+  border: 2px solid black;
+  user-select: none;
+  margin: auto;
+  grid-area: game;
+}
+
+.controls {
+  grid-area: controls;
+  padding: 150px 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  row-gap: 80px;
+  justify-content: center;
+  grid-template-areas:
+    ". btn ."
+    "arrowLeft upcoming arrowRight";
+}
+
+.row {
+  display: flex;
+}
+
+.upcoming {
+  grid-area: upcoming;
+  justify-self: center;
+}
+
+.glow-on-hover {
+  grid-area: btn;
+  width: 220px;
+  height: 50px;
+  border: none;
+  outline: none;
+  color: #fff;
+  background: #111;
+  cursor: pointer;
+  position: relative;
+  z-index: 0;
+  border-radius: 10px;
+}
+
+.glow-on-hover:before {
+  content: "";
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    #ff0000
+  );
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  background-size: 400%;
+  z-index: -1;
+  filter: blur(5px);
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  animation: glowing 20s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  border-radius: 10px;
+}
+
+.glow-on-hover:active {
+  color: #000;
+}
+
+.glow-on-hover:active:after {
+  background: transparent;
+}
+
+.glow-on-hover:hover:before {
+  opacity: 1;
+}
+
+.glow-on-hover:after {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #111;
+  left: 0;
+  top: 0;
+  border-radius: 10px;
+}
+
+@keyframes glowing {
+  0% {
+    background-position: 0 0;
   }
-  
-  .glow-on-hover:before {
-      content: '';
-      background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-      position: absolute;
-      top: -2px;
-      left:-2px;
-      background-size: 400%;
-      z-index: -1;
-      filter: blur(5px);
-      width: calc(100% + 4px);
-      height: calc(100% + 4px);
-      animation: glowing 20s linear infinite;
-      opacity: 0;
-      transition: opacity .3s ease-in-out;
-      border-radius: 10px;
+  50% {
+    background-position: 400% 0;
   }
-  
-  .glow-on-hover:active {
-      color: #000
+  100% {
+    background-position: 0 0;
   }
-  
-  .glow-on-hover:active:after {
-      background: transparent;
-  }
-  
-  .glow-on-hover:hover:before {
-      opacity: 1;
-  }
-  
-  .glow-on-hover:after {
-      z-index: -1;
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: #111;
-      left: 0;
-      top: 0;
-      border-radius: 10px;
-  }
-  
-  @keyframes glowing {
-      0% { background-position: 0 0; }
-      50% { background-position: 400% 0; }
-      100% { background-position: 0 0; }
-  }
-    .arrowLeft{
-      background-image: url('../assets/leftArrow2.webp');
-      background-size: cover;  
-      width: 60px;
-      aspect-ratio: 1;
-      grid-area: arrowLeft;
-      justify-self: end;
-      filter: hue-rotate(340deg); 
-    }
-    .arrowRight{
-      background-image: url('../assets/rightArrow2.webp');
-      filter: hue-rotate(340deg); 
-      background-size: cover;  
-      width: 60px;
-      aspect-ratio: 1;
-      grid-area: arrowRight;
-    }
-    
-    .cell {
-      width: 40px;
-      aspect-ratio: 1;
-      border: 1px solid black;
-    }
-    
-    .cell.hidden {
-      visibility: hidden;
-    }
-    
-    .cell.Empty {
-      background-color: rgb(200, 200, 200);
-    }
-    
-  /* Red */
-  .cell.IR, .cell.LR, .cell.OR,.cell.TR, .cell.ZR {
-    background-color: rgb(227, 78, 78);
-  }
-  
-  /* Blue */
-  .cell.IB, .cell.LB, .cell.OB, .cell.TB, .cell.ZB {
-    background-color: rgb(36, 95, 223);
-  }
-  
-  /* Green */
-  .cell.IG, .cell.LG, .cell.OG, .cell.TG, .cell.ZG {
-    background-color: rgb(48, 211, 56);
-  }
-  
-  
-    .cell.Char1 {
-      background-image: url('../assets/blueNaruto.png');
-      background-size: cover;  
-      width: 40px;
-      aspect-ratio: 1;
-    }
-    .cell.Char2 {
-        background-image: url('../assets/purpleNaruto.jpeg');
-        background-size: cover;  
-        width: 40px;
-        aspect-ratio: 1;
-      }
-      .cell.Char3 {
-        background-image: url('../assets/orangeNaruto.png');
-        background-size: cover;  
-        width: 40px;
-        aspect-ratio: 1;
-      }
-      .cell.Char4 {
-        background-image: url('../assets/pinkNaruto.png');
-        background-size: cover;  
-        width: 40px;
-        aspect-ratio: 1;
-      }
-      .cell.Char5 {
-        background-image: url('../assets/burgundyNaruto.png');
-        background-size: cover;  
-        width: 40px;
-        aspect-ratio: 1;
-      }
-    .collision{
-      border-color: red; 
-    background-image: linear-gradient(45deg, lightgrey 25%, transparent 25%, transparent 75%, lightgrey 75%, lightgrey), linear-gradient(-45deg, lightgrey 25%, transparent 25%, transparent 75%, lightgrey 75%, lightgrey); /* Diagonal stripes */
-    background-size: 10% 10%;
-    }
+}
+.arrowLeft {
+  background-image: url("../assets/leftArrow2.webp");
+  background-size: cover;
+  width: 60px;
+  aspect-ratio: 1;
+  grid-area: arrowLeft;
+  justify-self: end;
+  filter: hue-rotate(340deg);
+}
+.arrowRight {
+  background-image: url("../assets/rightArrow2.webp");
+  filter: hue-rotate(340deg);
+  background-size: cover;
+  width: 60px;
+  aspect-ratio: 1;
+  grid-area: arrowRight;
+}
+
+.cell {
+  width: 40px;
+  aspect-ratio: 1;
+  border: 1px solid black;
+}
+
+.cell.hidden {
+  visibility: hidden;
+}
+
+.cell.Empty {
+  background-color: rgb(200, 200, 200);
+}
+
+/* Red */
+.cell.IR,
+.cell.LR,
+.cell.OR,
+.cell.TR,
+.cell.ZR {
+  background-color: rgb(227, 78, 78);
+}
+
+/* Blue */
+.cell.IB,
+.cell.LB,
+.cell.OB,
+.cell.TB,
+.cell.ZB {
+  background-color: rgb(36, 95, 223);
+}
+
+/* Green */
+.cell.IG,
+.cell.LG,
+.cell.OG,
+.cell.TG,
+.cell.ZG {
+  background-color: rgb(48, 211, 56);
+}
+
+.cell.Char1 {
+  background-image: url("../assets/blueNaruto.png");
+  background-size: cover;
+  width: 40px;
+  aspect-ratio: 1;
+}
+.cell.Char2 {
+  background-image: url("../assets/purpleNaruto.jpeg");
+  background-size: cover;
+  width: 40px;
+  aspect-ratio: 1;
+}
+.cell.Char3 {
+  background-image: url("../assets/orangeNaruto.png");
+  background-size: cover;
+  width: 40px;
+  aspect-ratio: 1;
+}
+.cell.Char4 {
+  background-image: url("../assets/pinkNaruto.png");
+  background-size: cover;
+  width: 40px;
+  aspect-ratio: 1;
+}
+.cell.Char5 {
+  background-image: url("../assets/burgundyNaruto.png");
+  background-size: cover;
+  width: 40px;
+  aspect-ratio: 1;
+}
+.collision {
+  border-color: red;
+  background-image: linear-gradient(
+      45deg,
+      lightgrey 25%,
+      transparent 25%,
+      transparent 75%,
+      lightgrey 75%,
+      lightgrey
+    ),
+    linear-gradient(
+      -45deg,
+      lightgrey 25%,
+      transparent 25%,
+      transparent 75%,
+      lightgrey 75%,
+      lightgrey
+    ); /* Diagonal stripes */
+  background-size: 10% 10%;
+}
+.char-stat {
+  width: 100%;
+  text-align: center;
+  font-size: 15px;
+  border: 1px solid black;
+  width: 150px;
+}
+
+.char-stat-img {
+  width: inherit;
+  aspect-ratio: 1;
+}
+
+.board {
+  border: 2px solid black;
+  user-select: none;
+  margin: auto;
+  grid-area: game;
+}
+
+.controls {
+  grid-area: controls;
+  padding-top: 50px;
+}
+
+.row {
+  display: flex;
+}
+
+.upcoming {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cell {
+  width: 40px;
+  aspect-ratio: 1;
+  border: 1px solid black;
+  height: 40px;
+}
+
+.cell.hidden {
+  visibility: hidden;
+}
+
+.cell.Empty {
+  background-color: rgb(200, 200, 200);
+}
+
+/* Red */
+.cell.IR,
+.cell.LR,
+.cell.OR,
+.cell.TR,
+.cell.ZR {
+  background-color: rgb(227, 78, 78);
+}
+
+/* Blue */
+.cell.IB,
+.cell.LB,
+.cell.OB,
+.cell.TB,
+.cell.ZB {
+  background-color: rgb(36, 95, 223);
+}
+
+/* Green */
+.cell.IG,
+.cell.LG,
+.cell.OG,
+.cell.TG,
+.cell.ZG {
+  background-color: rgb(48, 211, 56);
+}
+
+.cell.Char1 {
+  background-size: cover;
+  width: 40px;
+  aspect-ratio: 1;
+}
+.cell.Char2 {
+  background-size: cover;
+  width: 40px;
+  aspect-ratio: 1;
+}
+.cell.Char3 {
+  background-size: cover;
+  width: 40px;
+  aspect-ratio: 1;
+}
+.cell.Char4 {
+  background-size: cover;
+  width: 40px;
+  aspect-ratio: 1;
+}
+.cell.Char5 {
+  background-size: cover;
+  width: 40px;
+  aspect-ratio: 1;
+}
+
+.collision {
+  border-color: red;
+  background-image: linear-gradient(
+      45deg,
+      lightgrey 25%,
+      transparent 25%,
+      transparent 75%,
+      lightgrey 75%,
+      lightgrey
+    ),
+    linear-gradient(
+      -45deg,
+      lightgrey 25%,
+      transparent 25%,
+      transparent 75%,
+      lightgrey 75%,
+      lightgrey
+    ); /* Diagonal stripes */
+  background-size: 10% 10%;
+}
+
+.Page {
+}

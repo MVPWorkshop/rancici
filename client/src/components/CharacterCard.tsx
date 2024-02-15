@@ -4,7 +4,7 @@ import * as visualisation from "../game/visualisation";
 
 import "../style/Battle.css";
 
-const CharacterCard = ({ player, ch, stateManager }) => {
+const CharacterCard = ({ pIdx, chIdx, stateManager }) => {
   const [isActive, setActiveStatus] = useState(false);
   const [stats, setStats] = useState({
     health: 400,
@@ -12,38 +12,52 @@ const CharacterCard = ({ player, ch, stateManager }) => {
     armor: 383,
   });
 
+  const player = `P${pIdx}`;
+  const ch = `Ch${chIdx}`;
+
   useEffect(() => {
-    visualisation.setCallback("onStepChange", (battleState) => {
+    visualisation.setCallback("onStepStart", (battleState) => {
       try {
         const newStats = battleState.step[player][ch].stats;
-        setActiveStatus(characterIsActive(battleState, player, ch));
+        setActiveStatus(characterIsActive(battleState, pIdx, chIdx));
         setStats(newStats);
-        // console.log("aftr::health", stats.health, "intended:", newStats.health);
       } catch (err) {
         console.log("ERR", { battleState, err, player, ch });
       }
     });
   }, []);
 
+  console.log({ isActive });
+
+  const className = "CharacterCard";
+
   return (
-    <div className={"CharacterCard" + isActive ? " ActiveCharacterCard" : ""}>
-      <img
-        className="CharacterCardImg"
-        src={`./characters/${ch.toLowerCase()}.png`}
-      ></img>
-      <div>Health: {stats.health}</div>
+    <div className="CharacterCardWrapper">
+      <div id={`CharacterCard-P-${pIdx}-Ch-${chIdx}`} className={className}>
+        <img
+          className="CharacterCardImg"
+          src={`./characters/${ch.toLowerCase()}.png`}
+        ></img>
+        <div>Health: {stats.health}</div>
+      </div>
     </div>
   );
 };
 
 export default CharacterCard;
 
-const characterIsActive = (battleState, player, ch) => {
+const characterIsActive = (battleState, pIdx, chIdx) => {
   const ans =
-    (player == `P${battleState.step.attacker.pIdx}` &&
-      ch == `Ch${battleState.step.attacker.chIdx}`) ||
-    (player == `P${battleState.step.target.pIdx}` &&
-      ch == `Ch${battleState.step.target.chIdx}`);
+    (pIdx == battleState.step.attacker.pIdx &&
+      chIdx == battleState.step.attacker.chIdx) ||
+    (pIdx == battleState.step.target.pIdx &&
+      chIdx == battleState.step.target.chIdx);
+
+  console.log(
+    "acrtive",
+    battleState.step.attacker.pIdx,
+    battleState.step.attacker.chIdx
+  );
 
   return ans;
 };
