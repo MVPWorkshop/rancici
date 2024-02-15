@@ -6,22 +6,42 @@ import CharacterCard from "../components/CharacterCard.tsx";
 
 import * as dataFetch from "../game/dataFetch";
 import * as visualisation from "../game/visualisation";
+import * as utils from "../utils/index.ts";
 
 import "../style/Battle.css";
 
 const Battle = ({ stateManager }) => {
   useEffect(() => {
     (async () => {
-      stateManager.updateState({ pageState: { status: "fetching" } });
+      stateManager.updateState({
+        pageState: { status: "fetching" },
+        modal: {
+          title: "Battle starting",
+          desc: ["..."],
+          blinking: true,
+          special: "battle_starting",
+        },
+      });
+
+      await utils.delay(2000);
 
       await dataFetch.run(stateManager, 1);
 
       visualisation.run(stateManager);
+
+      visualisation.setCallback("onFinish", (battleState) => {
+        stateManager.updateState({
+          modal: {
+            title: "Glorious Victory",
+            desc: ["You have advanced to LEVEL 2"],
+          },
+        });
+      });
     })();
   }, []);
 
   return (
-    <div className="Page Battle">
+    <div className="Page BattlePage">
       <Navbar stateManager={stateManager}></Navbar>
       <BattleVisualisation stateManager={stateManager}></BattleVisualisation>
       <div className="TeamInfoWrapper">

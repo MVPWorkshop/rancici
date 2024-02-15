@@ -177,3 +177,7 @@ p {
 .CharacterCardWrapper {
   width: 100px;
 }
+
+.BattleVisualisation {
+  animation: fadeIn 1s;
+}

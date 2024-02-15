@@ -27,8 +27,6 @@ const CharacterCard = ({ pIdx, chIdx, stateManager }) => {
     });
   }, []);
 
-  console.log({ isActive });
-
   const className = "CharacterCard";
 
   return (
@@ -52,12 +50,6 @@ const characterIsActive = (battleState, pIdx, chIdx) => {
       chIdx == battleState.step.attacker.chIdx) ||
     (pIdx == battleState.step.target.pIdx &&
       chIdx == battleState.step.target.chIdx);
-
-  console.log(
-    "acrtive",
-    battleState.step.attacker.pIdx,
-    battleState.step.attacker.chIdx
-  );
 
   return ans;
 };
