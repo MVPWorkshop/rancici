@@ -63,7 +63,7 @@ function generateStatsArray(numStats) {
   return statsArray;
 }
 
-function BattleComponent() {
+function BattleComponent({startBattle}) {
     // const {
     //     setup: {
     //         systemCalls: { createBattle, joinBattle, startBattle },
@@ -76,12 +76,6 @@ function BattleComponent() {
 
     const { board, isPlaying, chosenBlock, collisions, stats, setLeftBlock, setRightBlock } = useGameLogic();
 
-    // const stats = generateStatsArray(5);
-
-    function startBattle(){
-
-    }
-
   return (
     <div className="game-container">
       <h1></h1>
@@ -91,7 +85,7 @@ function BattleComponent() {
         <div className="arrowLeft"></div>
         <AvailableBlocks avaliableBlock={chosenBlock} />
         <div className="arrowRight"></div>
-        <button className="glow-on-hover" onClick={startBattle}>START BATTLE</button>
+        <button className="glow-on-hover" onClick={() => startBattle()}>START BATTLE</button>
       </div>
       <CharStats stats={stats} />
     </div>
