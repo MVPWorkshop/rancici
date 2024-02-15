@@ -238,21 +238,29 @@ function boardReducer(state: BoardState, action: Action): BoardState {
       chosenBlockShape: null,
       numberOfBlocksOnBoard: 0
       };
-    case 'drop':
-      console.log('case drop, chosenBlock from action: '+ action.chosenBlock);
-      console.log('case drop, chosenBlock from newstate: '+ newState.chosenBlock);
-      newState.chosenBlock = action.chosenBlock ?? newState.chosenBlock;
-      newState.chosenBlockId = action.chosenBlockId ?? newState.chosenBlockId;
-      const block= newState.chosenBlock;
-      newState.droppingBlock = block;
-      newState.droppingShape = newState.chosenBlockShape ?? SHAPES[block].shape;
-      newState.droppingRow= action.hoveredRowIndex ?? newState.droppingRow;
-      newState.droppingColumn=action.hoveredColumnIndex ?? newState.droppingColumn;
-      newState.collisions = getCollisions(newState.board,
-          newState.droppingShape,
-          newState.droppingRow,
-          newState.droppingColumn);
-      break;
+      case 'drop':
+        console.log('case drop, chosenBlock from action: '+ action.chosenBlock);
+        console.log('case drop, chosenBlock from newstate: '+ newState.chosenBlock);
+        newState.chosenBlock = action.chosenBlock ?? newState.chosenBlock;
+        newState.chosenBlockId = action.chosenBlockId ?? newState.chosenBlockId;
+        const block= newState.chosenBlock;
+        newState.droppingBlock = block;
+        if(action.hoveredRowIndex){
+          console.log('nema hovered indexa');
+          newState.droppingShape = newState.chosenBlockShape ?? SHAPES[block].shape;
+        }else{
+          newState.droppingShape = SHAPES[block].shape ?? newState.chosenBlockShape;
+        }
+        newState.chosenBlockShape = newState.droppingShape;
+        console.log('case drop, SHAPES[block].shape;: '+ SHAPES[block].shape);
+        console.log('case drop, chosen shape from newstate: '+ newState.chosenBlockShape);
+        newState.droppingRow= action.hoveredRowIndex ?? newState.droppingRow;
+        newState.droppingColumn=action.hoveredColumnIndex ?? newState.droppingColumn;
+        newState.collisions = getCollisions(newState.board,
+            newState.droppingShape,
+            newState.droppingRow,
+            newState.droppingColumn);
+        break;
     case 'setChosenBlock': //ovo mi nece vise trebati jer nema klik
       newState.chosenBlock = action.chosenBlock ?? Block.None;
       newState.chosenBlockId = action.chosenBlockId ?? -1;
