@@ -10,7 +10,7 @@ const PreBattle = ({ stateManager }) => {
   }, []);
 
   return (
-    <div className="Page PreBattle">
+    <div className="Page PreBattlePage">
       <Navbar stateManager={stateManager}></Navbar>
       <BattleComponent stateManager={stateManager} />
     </div>

@@ -20,15 +20,21 @@ const Login = ({ stateManager }) => {
 
           <div className="Sponsors">
             <div className="Pre">Built using: </div>
-            <div className="Dojo">
+            <div className="SponsorContainer">
               <img src="/dojo-logo.png"></img>
+              Dojo Engine
             </div>
-            <div className="Argent">
+            <div className="SponsorContainer">
               <img src="/argent-logo.png"></img>
+              Argent Mobile Wallet
             </div>
           </div>
         </div>
-        <button onClick={async () => connectWallet(stateManager)}>
+
+        <button
+          className="LoginButton"
+          onClick={async () => connectWallet(stateManager)}
+        >
           Connect Wallet
         </button>
       </div>

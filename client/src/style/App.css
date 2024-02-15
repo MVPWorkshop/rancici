@@ -16,6 +16,7 @@
 .button-style {
   background-color: lightgrey;
   border: 2px solid darkgrey;
+  color: red;
 }
 
 .text-style {
@@ -501,6 +502,9 @@ h1 {
 
 .Page {
 }
+.PreBattlePage {
+  animation: fadeIn 2s forwards;
+}
 .Blink {
   animation: blinker 0.5s 20 step-start backwards;
 }
@@ -548,6 +552,7 @@ h1 {
 }
 
 .Login .Info {
+  padding-top: 50px;
   width: 600px;
   height: 600px;
   background-color: rgba(0, 0, 0, 0.7);
@@ -558,8 +563,12 @@ h1 {
 }
 
 .Login .Info .Description {
+  margin-top: 30px;
   text-align: left;
-  padding-left: 20px;
+  padding-left: 80px;
+  color: white;
+  font-size: 17px;
+  line-height: 50px;
 }
 
 .Login .Info .Description .Main {
@@ -569,8 +578,9 @@ h1 {
   display: flex;
 }
 .Login .Info .Description .Sponsors img {
-  height: 40px;
-  width: 40px;
+  height: 30px;
+  width: 30px;
+  margin: 10px;
 }
 
 .Login .Info .Logo {
@@ -578,7 +588,8 @@ h1 {
   width: inherit;
   cursor: pointer;
   text-align: center;
-  color: rgba(231, 231, 231, 0.37);
+  /* color: rgba(231, 231, 231, 0.37); */
+  color: white;
 }
 
 .Login .Info .Logo img {
@@ -679,4 +690,12 @@ h1 {
 .BattleImgSymbol {
   width: 100px;
   height: 100px;
+}
+
+.SponsorContainer {
+  display: flex;
+}
+
+.LoginButton {
+  margin-top: 60px;
 }
