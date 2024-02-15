@@ -11,16 +11,14 @@ const PreBattle = ({ stateManager }) => {
     stateManager.updateState({ pageState });
   }, []);
 
-  return (
-    <div className="PreBattle">
-      <Navbar stateManager={stateManager}></Navbar>
+  const startBattle = () => {
+    sendMove(stateManager, "full move info");
+  };
 
-      {/* <h3>Page: PreBattle</h3>
-      <h3>Status: {stateManager.state.pageState.status}</h3>
-      <button onClick={() => sendMove(stateManager, "full move info")}>
-        Random move
-      </button> */}
-      <BattleComponent/>
+  return (
+    <div className="Page PreBattle">
+      <Navbar stateManager={stateManager}></Navbar>
+      <BattleComponent stateManager={stateManager} startBattle={startBattle} />
     </div>
   );
 };

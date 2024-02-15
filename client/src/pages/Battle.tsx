@@ -21,12 +21,8 @@ const Battle = ({ stateManager }) => {
   }, []);
 
   return (
-    <div className="Battle">
+    <div className="Page Battle">
       <Navbar stateManager={stateManager}></Navbar>
-
-      <h3>Page: Battle</h3>
-      <h3>Status: {stateManager.state.pageState.status}</h3>
-
       <BattleVisualisation stateManager={stateManager}></BattleVisualisation>
       <div className="TeamInfoWrapper">
         <TeamInfo stateManager={stateManager} pIdx="1"></TeamInfo>
@@ -40,12 +36,13 @@ export default Battle;
 
 const TeamInfo = ({ stateManager, pIdx }) => {
   const CHARACTER_COUNT = 5;
+
   return (
     <div className={`P${pIdx}-Ch-Info`}>
       {Array.from({ length: CHARACTER_COUNT }, (_, i) => i + 1).map((chIdx) => (
         <CharacterCard
-          player={`P${pIdx}`}
-          ch={`Ch${chIdx}`}
+          pIdx={pIdx}
+          chIdx={chIdx}
           stateManager={stateManager}
         ></CharacterCard>
       ))}

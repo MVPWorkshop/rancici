@@ -1,13 +1,20 @@
-const CharStat = ({stat}) => {
-    const className = `cell ${stat.charBlock}`;
+const CharStat = ({ stat }) => {
+  const chIdx = stat.charBlock.replace("Char", "");
+
   return (
     <div className="char-stat">
-    <div className={className}></div>
-      <p>Armor: <strong>{stat.armor}</strong></p>
-      <p>Health: <strong>{stat.health}</strong></p>
-      <p>Attack: <strong>{stat.attack}</strong></p>
+      <img className="char-stat-img" src={`/characters/ch${chIdx}.png`}></img>
+      <p>
+        Armor: <strong>{stat.armor}</strong>
+      </p>
+      <p>
+        Health: <strong>{stat.health}</strong>
+      </p>
+      <p>
+        Attack: <strong>{stat.attack}</strong>
+      </p>
     </div>
-  )
-}
+  );
+};
 
-export default CharStat
+export default CharStat;

@@ -51,10 +51,10 @@ export enum Block {
   export const SHAPES: ShapesObj = {
     IR: {
       shape: [
-        [false, false, true, false],
-        [false, false, true, false],
-        [false, false, true, false],
-        [false, false, true, false],
+        [false, false, false, false],
+        [false, false, false, false],
+        [true, true, true, true],
+        [false, false, false, false],
       ],
     },
     IB: {
@@ -67,10 +67,10 @@ export enum Block {
     },
     IG: {
       shape: [
-        [true, false, false, false],
-        [true, false, false, false],
-        [true, false, false, false],
-        [true, false, false, false],
+        [false, false, false, false],
+        [false, false, false, false],
+        [true, true, true, true],
+        [false, false, false, false],
       ],
     },
     LR: {
