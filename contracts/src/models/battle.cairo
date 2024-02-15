@@ -12,7 +12,6 @@ struct Battle {
     player2_formation_revealed: bool,
     winner: ContractAddress,
     status: BattleStatus,
-    started: bool,
 }
  
 // This enum simply defines the states of a game.

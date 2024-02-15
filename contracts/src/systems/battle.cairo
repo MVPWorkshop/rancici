@@ -78,7 +78,6 @@ mod battle {
                         id: battleId, 
                         player1: player, 
                         player2: contract_address_const::<0>(), 
-                        started: false,
                         player1_formation_hash: 0,
                         player2_formation_hash: 0,
                         player1_formation_revealed: false,
@@ -266,11 +265,9 @@ mod battle {
             let player = get_caller_address();
 
             let mut battle: Battle = get!(world, battleId, Battle);
-            assert(battle.started != true, 'Battle already started');
-            assert(battle.status == BattleStatus::REVEAL_DONE, 'Reveal not done');
+            assert(battle.status == BattleStatus::REVEAL_DONE, 'Wrong battle status');
             assert(battle.player1 != battle.player2, 'Can not battle with yourself');
 
-            battle.started = true;
             // load characters
             let mut player1Character1: Character = get!(world, (0, battle.player1, battleId), Character);
             let mut player1Character2: Character = get!(world, (1, battle.player1, battleId), Character);
@@ -721,6 +718,7 @@ mod battle {
                     }
                 }
             };
+            battle.status = BattleStatus::FINISHED;
             set!(world, (battle, player1Character1, player1Character2, player1Character3, player1Character4, player1Character5, player2Character1, player2Character2, player2Character3, player2Character4, player2Character5));
             emit!(world, BattleFinished{battleId: battleId, winner: battle.winner});
 }
