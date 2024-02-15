@@ -16,7 +16,7 @@ echo "--------------------------------------------------------------------------
 
 
 # enable system -> component authorizations
-COMPONENTS=("Battle" "BattleConfig")
+COMPONENTS=("Battle" "BattleConfig" "Character")
 
 for component in ${COMPONENTS[@]}; do
     sozo auth writer $component $BATTLE_ADDRESS --world $WORLD_ADDRESS --rpc-url $RPC_URL
