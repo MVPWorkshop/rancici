@@ -758,7 +758,6 @@ mod battle {
             battle.status = BattleStatus::FINISHED;
             set!(world, (battle, player1Character1, player1Character2, player1Character3, player1Character4, player1Character5, player2Character1, player2Character2, player2Character3, player2Character4, player2Character5));
             emit!(world, BattleFinished{battleId: battleId, winner: battle.winner});
-}
-        //treba li da return-ujes f-je?
+        }
     }
 }
