@@ -31,6 +31,12 @@ Players enter matches in which they get:
 
 See [Contracts section](./contracts/README.md) for more information.
 
+## Further Directions
+
+We are exploring couple of main further directions for the Rancici Universe, some being:
+
+- Multiplayer mode, Multi-round matches, Community-driven tournaments/leagues, ...
+
 ## Table of Contents
 
 - [Detailed Game Flow](#detailed-game-flow)
@@ -80,9 +86,3 @@ Check [Contracts](./contracts/README.md) and [Client](./client/readme.md) sectio
 ## Controls
 
 For CLI battle commands and controls look at [Battle Steps Commands](./contracts/README.md#battle-steps-commands-localy) section.
-
-## Further Directions
-
-We are exploring couple of main further directions for the Rancici Universe, some being:
-
-- Multiplayer mode, Multi-round matches, Community-driven tournaments/leagues, ...
