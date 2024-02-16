@@ -79,7 +79,7 @@ Check [Contracts](./contracts/README.md) and [Client](./client/readme.md) sectio
 
 ## Controls
 
-For CLI battle commands and controls look at [Battle Steps Commands](./contracts/README.md#battle-steps-commands-localy).
+For CLI battle commands and controls look at [Battle Steps Commands](./contracts/README.md#battle-steps-commands-localy) section.
 
 ## Further Directions
 
