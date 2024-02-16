@@ -43,6 +43,7 @@ import { useEffect, useState } from "react";
 // import { battleEventEmitter } from '../dojo/createSystemCalls';
 // import { useComponentValue } from "@latticexyz/react";
 import Board from "./Board";
+import Countdown from "../components/Countdown.tsx";
 // import { EmptyCell } from "../types";
 import AvailableBlocks from "./AvailableBlocks";
 import { useGameLogic } from "../hooks/useGameLogic";
@@ -79,18 +80,31 @@ function BattleComponent({ stateManager, startBattle }) {
     useGameLogic();
 
   return (
-    <div className="game-container-wrapper">
-      <div className="game-container">
-        <h1></h1>
-        <Board currentBoard={board} collidedCells={collisions} />
-        <div className="controls">
-          <h2 />
-          <div className="arrowLeft"></div>
-          <AvailableBlocks avaliableBlock={chosenBlock} />
-          <div className="arrowRight"></div>
+    <div className="game-container-wrapper-2">
+      <div className="game-container-wrapper">
+        <div className="game-container">
+          <Board currentBoard={board} collidedCells={collisions} />
+          <div className="controls">
+            <div className="arrowLeft"></div>
+            <AvailableBlocks avaliableBlock={chosenBlock} />
+            <div className="arrowRight"></div>
+          </div>
+          <CharStats stats={stats} />
+        </div>
+      </div>
+
+      <div className="Metadata">
+        <div className="MatchId">
+          <div className="Text">Match ID:</div>
+          <div className="Value">3738141</div>
+        </div>
+
+        <div className="start-battle-btn-wrapper">
+          <Countdown stateManager={stateManager}></Countdown>
           <button
-            className="glow-on-hover"
+            className="start-battle-btn"
             onClick={async () => {
+              stateManager.updateState({ countdown: { visible: false } });
               await sendMove(stateManager, "full_move_info...");
               stateManager.updateState({
                 page: "Battle",
@@ -103,7 +117,6 @@ function BattleComponent({ stateManager, startBattle }) {
             START BATTLE
           </button>
         </div>
-        <CharStats stats={stats} />
       </div>
     </div>
   );

@@ -6,6 +6,8 @@
   height: 100%;
   --navbar-height: 40px;
   --navbar-element-height: 40px;
+  --cell-width: 55px;
+  --cell-height: 55px;
   font-family: "Open Sans", sans-serif;
   font-optical-sizing: auto;
   font-weight: 600;
@@ -16,7 +18,8 @@
 .button-style {
   background-color: lightgrey;
   border: 2px solid darkgrey;
-  color: red;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
 }
 
 .text-style {
@@ -45,16 +48,27 @@
 /* Navbar ------------------------------------------------------> */
 
 .Navbar {
-  padding: 5px;
-  border-bottom: 1px solid orange;
+  /* padding: 5px; */
+  border-bottom: 1px solid white;
   height: var(--navbar-height);
   display: flex;
   justify-content: space-between;
-  width: 100%;
-  margin: 0 auto;
-  padding-left: 10px;
+  width: 1750px;
+  /* margin: 0 auto; */
+  /* padding-left: 10px;
   padding-right: 10px;
-  margin-bottom: 50px;
+  margin-bottom: 50px; */
+  background-color: rgba(0, 0, 0, 0.7);
+  position: absolute;
+  left: 0;
+  /* width: 2000px; */
+  top: 0%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  padding: 20px;
+  padding-right: 100px;
+  padding-left: 100px;
+  color: white;
 }
 
 .Navbar .Logo {
@@ -63,6 +77,7 @@
   height: var(--navbar-element-height);
   cursor: pointer;
   display: flex;
+  color: white;
 }
 
 .Navbar .Logo img {
@@ -96,14 +111,26 @@
   border-radius: 2px;
 }
 
-.Navbar .RightSideWrapper .Argent .Address {
-  /* height: var(--navbar-element-height); */
+.Navbar .RightSideWrapper .Argent .Img {
+  height: calc(var(--navbar-element-height) / 2);
+  width: calc(var(--navbar-element-height) / 2);
+  border-radius: 2px;
+  background: linear-gradient(to top, #1e083046, #9907fa49),
+    url("../../public/argent-logo.png") no-repeat top center;
+
+  background-size: calc(var(--navbar-element-height) / 2)
+    calc(var(--navbar-element-height) / 2);
+}
+
+.Address {
+  padding: 10px;
+  line-height: 20px;
+  font-size: 15px;
   width: 100px;
-  /* display: flex; */
-  /* justify-content: space-evenly; */
-  /* font-size: 15px; */
-  line-height: calc(var(--navbar-element-height) / 2.4);
-  font-size: calc(var(--navbar-element-height) / 3.5);
+}
+
+.Navbar .RightSideWrapper .Img {
+  margin: 0 auto;
 }
 
 .Navbar .RightSideWrapper .Dojo {
@@ -117,16 +144,20 @@
   border-radius: 2px;
 }
 
-.Navbar .RightSideWrapper .Dojo .Address {
-  /* height: var(--navbar-element-height); */
-  width: 100px;
-  /* display: flex; */
-  /* justify-content: space-evenly; */
-  /* font-size: 15px; */
-  line-height: calc(var(--navbar-element-height) / 2.4);
-  font-size: calc(var(--navbar-element-height) / 3.5);
+.Navbar .RightSideWrapper .Dojo .Img {
+  height: calc(var(--navbar-element-height) / 2);
+  width: calc(var(--navbar-element-height) / 2);
+  border-radius: 2px;
+  background: linear-gradient(to top, #1e083046, #9907fa49),
+    url("../../public/dojo-logo.png") no-repeat top center;
+
+  background-size: calc(var(--navbar-element-height) / 2)
+    calc(var(--navbar-element-height) / 2);
 }
 
+.Navbar .RightSideWrapper button {
+  margin-left: 33px;
+}
 .game-container {
   display: grid;
   grid-template-areas:
@@ -149,7 +180,10 @@ h1 {
   justify-content: center;
   grid-column-start: 1;
   grid-column-end: 4;
-  padding: 0 100px;
+  /* padding: 0 100px; */
+  margin: 0 auto;
+  width: 90%;
+  margin-top: 33px;
 }
 
 .char-stat {
@@ -284,7 +318,8 @@ h1 {
 }
 
 .cell {
-  width: 40px;
+  width: var(--cell-width);
+  height: var(--cell-height);
   aspect-ratio: 1;
   border: 1px solid black;
 }
@@ -294,7 +329,7 @@ h1 {
 }
 
 .cell.Empty {
-  background-color: rgb(200, 200, 200);
+  background-color: rgba(65, 32, 77, 0.31);
 }
 
 /* Red */
@@ -303,7 +338,7 @@ h1 {
 .cell.OR,
 .cell.TR,
 .cell.ZR {
-  background-color: rgb(227, 78, 78);
+  background-color: rgba(20, 20, 20, 0.6);
 }
 
 /* Blue */
@@ -312,7 +347,7 @@ h1 {
 .cell.OB,
 .cell.TB,
 .cell.ZB {
-  background-color: rgb(36, 95, 223);
+  background-color: rgba(235, 235, 235, 0.3);
 }
 
 /* Green */
@@ -321,56 +356,52 @@ h1 {
 .cell.OG,
 .cell.TG,
 .cell.ZG {
-  background-color: rgb(48, 211, 56);
+  background-color: rgba(72, 24, 102, 0.5855);
 }
 
 .cell.Char1 {
-  background-image: url("../assets/blueNaruto.png");
-  background-size: cover;
-  width: 40px;
+  width: var(--cell-width);
+  height: var(--cell-height);
   aspect-ratio: 1;
 }
 .cell.Char2 {
-  background-image: url("../assets/purpleNaruto.jpeg");
-  background-size: cover;
-  width: 40px;
+  width: var(--cell-width);
+  height: var(--cell-height);
   aspect-ratio: 1;
 }
 .cell.Char3 {
-  background-image: url("../assets/orangeNaruto.png");
-  background-size: cover;
-  width: 40px;
+  width: var(--cell-width);
+  height: var(--cell-height);
   aspect-ratio: 1;
 }
 .cell.Char4 {
-  background-image: url("../assets/pinkNaruto.png");
-  background-size: cover;
-  width: 40px;
+  width: var(--cell-width);
+  height: var(--cell-height);
   aspect-ratio: 1;
 }
 .cell.Char5 {
-  background-image: url("../assets/burgundyNaruto.png");
-  background-size: cover;
-  width: 40px;
+  width: var(--cell-width);
+  height: var(--cell-height);
   aspect-ratio: 1;
 }
+
 .collision {
-  border-color: red;
+  border-color: rgba(255, 0, 0, 0.814);
   background-image: linear-gradient(
       45deg,
-      lightgrey 25%,
+      rgba(108, 20, 20, 0.766) 25%,
       transparent 25%,
       transparent 75%,
-      lightgrey 75%,
-      lightgrey
+      rgba(108, 20, 20, 0.766) 75%,
+      rgba(108, 20, 20, 0.766)
     ),
     linear-gradient(
       -45deg,
-      lightgrey 25%,
+      rgba(108, 20, 20, 0.766) 25%,
       transparent 25%,
       transparent 75%,
-      lightgrey 75%,
-      lightgrey
+      rgba(108, 20, 20, 0.766) 75%,
+      rgba(108, 20, 20, 0.766)
     ); /* Diagonal stripes */
   background-size: 10% 10%;
 }
@@ -379,7 +410,8 @@ h1 {
   text-align: center;
   font-size: 15px;
   border: 1px solid black;
-  width: 150px;
+  width: 120px;
+  margin: 0 auto;
 }
 
 .char-stat-img {
@@ -394,11 +426,6 @@ h1 {
   grid-area: game;
 }
 
-.controls {
-  grid-area: controls;
-  padding-top: 50px;
-}
-
 .row {
   display: flex;
 }
@@ -411,97 +438,10 @@ h1 {
   gap: 10px;
 }
 
-.cell {
-  width: 40px;
-  aspect-ratio: 1;
-  border: 1px solid black;
-  height: 40px;
-}
-
 .cell.hidden {
   visibility: hidden;
 }
 
-.cell.Empty {
-  background-color: rgb(200, 200, 200);
-}
-
-/* Red */
-.cell.IR,
-.cell.LR,
-.cell.OR,
-.cell.TR,
-.cell.ZR {
-  background-color: rgb(227, 78, 78);
-}
-
-/* Blue */
-.cell.IB,
-.cell.LB,
-.cell.OB,
-.cell.TB,
-.cell.ZB {
-  background-color: rgb(36, 95, 223);
-}
-
-/* Green */
-.cell.IG,
-.cell.LG,
-.cell.OG,
-.cell.TG,
-.cell.ZG {
-  background-color: rgb(48, 211, 56);
-}
-
-.cell.Char1 {
-  background-size: cover;
-  width: 40px;
-  aspect-ratio: 1;
-}
-.cell.Char2 {
-  background-size: cover;
-  width: 40px;
-  aspect-ratio: 1;
-}
-.cell.Char3 {
-  background-size: cover;
-  width: 40px;
-  aspect-ratio: 1;
-}
-.cell.Char4 {
-  background-size: cover;
-  width: 40px;
-  aspect-ratio: 1;
-}
-.cell.Char5 {
-  background-size: cover;
-  width: 40px;
-  aspect-ratio: 1;
-}
-
-.collision {
-  border-color: red;
-  background-image: linear-gradient(
-      45deg,
-      lightgrey 25%,
-      transparent 25%,
-      transparent 75%,
-      lightgrey 75%,
-      lightgrey
-    ),
-    linear-gradient(
-      -45deg,
-      lightgrey 25%,
-      transparent 25%,
-      transparent 75%,
-      lightgrey 75%,
-      lightgrey
-    ); /* Diagonal stripes */
-  background-size: 10% 10%;
-}
-
-.Page {
-}
 .PreBattlePage {
   animation: fadeIn 2s forwards;
 }
@@ -530,7 +470,7 @@ h1 {
   width: 600px; /* Could be more or less, depending on screen size */
   /* height: 400px; */
   position: absolute;
-  top: 35%;
+  top: 43%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
@@ -545,9 +485,9 @@ h1 {
   right: 0;
   /* height: 100px; */
   /* width: 100px; */
-  background-image: url("../../public/background.jpg");
+  background-image: url("../../public/back2.jpeg");
   background-repeat: no-repeat;
-  background-size: 2700px auto;
+  background-size: auto 1200px;
   z-index: -100;
 }
 
@@ -610,6 +550,7 @@ h1 {
   height: 48px;
   position: absolute;
   top: 30%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 3;
@@ -698,4 +639,93 @@ h1 {
 
 .LoginButton {
   margin-top: 60px;
+}
+
+.BackgroundImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-image: url("../../public/back2.jpeg");
+
+  z-index: -100;
+  background: linear-gradient(to top, #1e0830a8, #9907fa83),
+    url("../../public/back2.jpeg") no-repeat top center;
+  background-repeat: no-repeat;
+  background-size: 2000px auto;
+}
+
+.App {
+  /* padding: 5px 100px; */
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.Page {
+  /* position: absolute; */
+  /* top: 200px; */
+  padding: 5px 100px;
+  /* top: 50%; */
+  /* left: 50%;
+  transform: translate(-50%, -50%); */
+  width: 1301px;
+  margin: 0 auto;
+  margin-top: 200px;
+  height: 900px;
+}
+
+.PageContent {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  height: 900px;
+}
+.Metadata {
+  position: absolute;
+  top: 250px;
+  left: 380px;
+  display: flex;
+  justify-content: space-between;
+  width: 1201px;
+}
+
+.Metadata .MatchId {
+  display: flex;
+  font-family: "MyWebFont";
+  font-size: 33px;
+}
+.Metadata .MatchId .Text {
+  margin-right: 33px;
+}
+.start-battle-btn-wrapper {
+  /* position: absolute; */
+  /* top: 250px;
+  left: 1200px; */
+  display: flex;
+}
+..start-battle-btn,
+.Countdown {
+  padding: 10px 20px;
+}
+
+.Countdown {
+  display: flex;
+  justify-content: space-evenly;
+  color: white;
+  /* background-color: rgba(0, 0, 0, 0.8); */
+  background-color: rgba(73, 25, 86, 0.656);
+  width: 200px;
+  line-height: 50px;
+}
+
+.board,
+.GridWrapper {
+  margin-top: 150px;
+}
+
+.TeamInfoWrapper {
+  margin-top: 140px;
 }

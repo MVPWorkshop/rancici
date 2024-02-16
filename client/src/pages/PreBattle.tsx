@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 
-import Navbar from "../components/Navbar.tsx";
 import BattleComponent from "../components/Battle.tsx";
+import * as utils from "../utils/index.ts";
 
 const PreBattle = ({ stateManager }) => {
   useEffect(() => {
-    const pageState = { status: "choice" };
-    stateManager.updateState({ pageState });
+    stateManager.updateState({ pageState: { status: "choice" } });
   }, []);
 
   return (
     <div className="Page PreBattlePage">
-      <Navbar stateManager={stateManager}></Navbar>
-      <BattleComponent stateManager={stateManager} />
+      <div className="PageContent">
+        <BattleComponent stateManager={stateManager} />
+      </div>
     </div>
   );
 };

@@ -36,7 +36,10 @@ const CharacterCard = ({ pIdx, chIdx, stateManager }) => {
           className="CharacterCardImg"
           src={`./characters/${ch.toLowerCase()}.png`}
         ></img>
-        <div>Health: {stats.health}</div>
+        <div>
+          Health: <br></br>
+          {stats.health}
+        </div>
       </div>
     </div>
   );

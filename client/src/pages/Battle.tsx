@@ -42,11 +42,12 @@ const Battle = ({ stateManager }) => {
 
   return (
     <div className="Page BattlePage">
-      <Navbar stateManager={stateManager}></Navbar>
-      <BattleVisualisation stateManager={stateManager}></BattleVisualisation>
-      <div className="TeamInfoWrapper">
-        <TeamInfo stateManager={stateManager} pIdx="1"></TeamInfo>
-        <TeamInfo stateManager={stateManager} pIdx="2"></TeamInfo>
+      <div className="PageContent">
+        <BattleVisualisation stateManager={stateManager}></BattleVisualisation>
+        <div className="TeamInfoWrapper">
+          <TeamInfo stateManager={stateManager} pIdx="1"></TeamInfo>
+          <TeamInfo stateManager={stateManager} pIdx="2"></TeamInfo>
+        </div>
       </div>
     </div>
   );
