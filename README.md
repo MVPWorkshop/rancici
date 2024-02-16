@@ -10,8 +10,10 @@ Players enter matches in which they get:
 
 - Grid (7x7) on which 5 random characters from the Rancici Universe are placed
   - Where each character has: Health, Armor, and Attack statistic
-- Different shapes (10) that have one of 3 effects on character statistics if the shape occupies one of his adjacent cells
-  - These shapes can be rotated, and cannot overlap
+- Different shapes (10) that have:
+  - One of 3 effects (+30 Health, +20 Attack or +15 Armor) on character statistics
+    - (If the shape occupies one of his adjacent cells)
+  - These shapes can be rotated, but cannot overlap
 
 **Goal of the Game** is to find the optimal positioning of the shapes, given the character placement, and the opponent they have encountered.
 
