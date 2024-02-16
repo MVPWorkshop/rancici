@@ -13,15 +13,13 @@
 
 
 ## Description
-PvP battle game. Players can create or join battles.
+PvP battle game (Futuristic Naruto Style). Players can create or join battles.
 
 When players are matched in battle, each player get random positions of 5 charaters (in 7x7 grid) and 10 tetris shapes (with random colours) which boost default character stats (health, attack, armor).
 
-Each player chooses his formation of (max 5) shapes and commits to it (posting hash on chain). After both players commit to their formation, they need to send actual formation to the chain.
+Each player chooses his formation of (max 5) shapes and commits to it (posting hash on chain). After both players commit to their formation, they need to send actual formation to the chain.After both players send their formations, the battle starts. 
 
-After both players send their formations, the battle starts. Battle is run automatically where each players's first live character attacks first live character of other player.
-
-Automatic battle is run until one of the players has no live characters left or 50 turns are made, at which point player with most health (sum of all characters health) wins
+Battle is run automatically where each players's first alive character attacks the first alive character of the other player in loop. Automatic battle is run until one of the players has no live characters left or 50 turns (each) are made, at which point player with most health (sum of all characters health) wins.
 
 ## Features
 PVP battle game with following features:
