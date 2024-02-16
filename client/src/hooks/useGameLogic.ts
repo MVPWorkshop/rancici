@@ -93,6 +93,9 @@ export function useGameLogic() {
     });
    
     commitAudio.play();
+    const boardFormation = getFormation(renderedBoard);
+    setFormation(boardFormation);
+    setCharPositionsInFormation(getCharPositions(boardFormation));
     setIsCommitting(true);
   }, [
     board,
@@ -253,9 +256,9 @@ useEffect(() => {
 useEffect(() => {
   const handleStopPLaying = () =>{
     console.log('stop playing');
-    const boardFormation = getFormation(renderedBoard);
-    setFormation(boardFormation);
-    setCharPositionsInFormation(getCharPositions(boardFormation));
+    // const boardFormation = getFormation(renderedBoard);
+    // setFormation(boardFormation);
+    // setCharPositionsInFormation(getCharPositions(boardFormation));
     setIsPlaying(false);
     dispatchBoardState({type: 'stop'});
   }

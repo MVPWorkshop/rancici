@@ -1,38 +1,3 @@
-// interface BattleComponentProps {
-//     battleId: number;
-//     started: boolean;
-//     joined: boolean;
-//     setBattleIdValue: (value: number) => void;
-//   }
-
-//   const BattleComponent: React.FC<BattleComponentProps> = ({ battleId, started, joined, setBattleIdValue }) => {
-
-//     const handleClick = () => {
-//       setBattleIdValue(battleId);
-//     };
-
-//     const getStatus = () => {
-//       if (started) {
-//           return { status: 'started', color: 'green' };
-//       } else if (joined) {
-//           return { status: 'joined', color: 'orange' };
-//       } else {
-//           return { status: 'created', color: 'blue' };
-//       }
-//   };
-  
-//     return (
-//       <div>
-//         <p onClick={handleClick}>
-//             Battle with id: <span style={{ color: getStatus().color }}>{battleId}</span> 
-//             , status: <span style={{ color: getStatus().color }}>{getStatus().status}</span>
-//         </p>
-//       </div>
-//     );
-//   };
-
-// export default BattleComponent
-
 import { Entity , getComponentValue, getComponentEntities} from "@dojoengine/recs";
 import { useEffect, useState } from "react";
 // import "./App.css";
@@ -58,17 +23,8 @@ import { battleEventEmitter } from '../dojo/createSystemCalls';
 export const stopPlayingClickEmitter = new EventEmitter();
 
 function BattleComponent({startBattle}) {
-    // const {
-    //     setup: {
-    //         systemCalls: { createBattle, joinBattle, startBattle },
-    //         clientComponents: { Backpack, Battle, BattleConfig, Item },
-    //     },
-    //     account,
-    //     masterAccount,
-    //     secondAccount
-    // } = useDojo();
 
-        const {
+  const {
         setup: {
             systemCalls: { createBattle, joinBattle, startBattleSC, commitFormation,revealFormation },
             clientComponents: { Character, Battle, BattleConfig },
@@ -112,13 +68,6 @@ console.log("join");
 
     const [state, setState] = useState(PreBattleState.Awaiting_Commitment);
 
-//     const entity = getEntityIdFromKeys ([BigInt(battleId
-//   ] )as Entity;
-
-//     const val = getComponentValue(Battle, entity);
-// console.log("VALUE: "+val);
-    // setBattleId(val.id);
-
     const handleClick = () => {
       switch(state){
         case PreBattleState.Awaiting_Commitment:
@@ -128,6 +77,9 @@ console.log("join");
           break;
         case PreBattleState.Awaiting_Reveal:
           setState(PreBattleState.Reveal_Done);
+          // formation.unshift(49);
+          console.log("new form: "+formation);
+          // charPositionsInFormation.unshift(5);
           revealFormation(masterAccount, battleId, formation.toString(), charPositionsInFormation.toString());
           break;
         case PreBattleState.Reveal_Done:
