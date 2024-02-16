@@ -17,10 +17,17 @@ Players enter matches in which they get:
 
 ## Build Description
 
-It has been built using:
+#### It has been built using:
 
 - **Dojo Engine tooling** (Sozo, Katana, Torii, NPM package: Create Burner) for the Game's contract development/test/deployment and Front connection
 - **Argent Mobile Wallet** as the primary user wallet
+
+#### Deployed Contracts (Goerli Testnet)
+
+- [Rancici World Contract](https://goerli.voyager.online/contract/0x04ebcc658b6fce7b61303e2137cdd8cab4e93728e0872ee0ba3be5432ee0b4fe)
+- [Rancici Battle System (Actions) Contract](https://goerli.voyager.online/contract/0x117c911e19bc749a741066e1f210ce5673283ab2a745b2cd0ebfa237783448)
+
+See [Contracts section](./contracts/README.md) for more information.
 
 ## Table of Contents
 
