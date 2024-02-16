@@ -3,8 +3,9 @@ import { Block, BlockShape, BoardShape, EmptyCell, SHAPES } from '../types';
 import { useInterval } from './useInterval';
 import soundEffectFile from "../assets/click-button-140881.mp3"; 
 import commitEffectFile from "../assets/commit-sound.mp3";
+import rotateEffectFile from "../assets/218453-ICE_Skate_scrape_one_leg_rotate_10.wav";
 import {
-  useTetrisBoard,
+  useBoard,
   hasCollisions,
   BOARD_HEIGHT,
   getEmptyBoard,
@@ -13,6 +14,7 @@ import {
 } from './useBoard';
 import {chosenBlockEmitter} from "../components/AvailableBlocks";
 import {cellHoverEmitter} from "../components/Board";
+import {stopPlayingClickEmitter} from "../components/Battle";
 
 enum TickSpeed {
   Normal = 800,
@@ -23,7 +25,7 @@ enum TickSpeed {
 export function useGameLogic() {
   const audio = new Audio(soundEffectFile);
   const commitAudio = new Audio(commitEffectFile);
-
+  const rotateAudio = new Audio(rotateEffectFile);
   const [score, setScore] = useState(0);
   const [upcomingBlocks, setUpcomingBlocks] = useState<Block[]>([]);
   const [upcomingBlock, setUpcomingBlock] = useState<Block>();
@@ -35,14 +37,16 @@ export function useGameLogic() {
   { charBlock: Block.Char3, health: 100, armor: 0, attack: 50, blockId: 13 },
   { charBlock: Block.Char4, health: 100, armor: 0, attack: 50, blockId: 14 },
   { charBlock: Block.Char5, health: 100, armor: 0, attack: 50, blockId: 15 }];
-    const newUpcomingBlocks = structuredClone(upcomingBlocks) as Block[];
+  const newUpcomingBlocks = structuredClone(upcomingBlocks) as Block[];
 
   const [stats, setStats] = useState(initialStats);
+  const [formation, setFormation] = useState<number[]>([]);
+  const [charPositionsInFormation, setCharPositionsInFormation] = useState<number[]>([]);
 
   const [
     { board, droppingRow, droppingColumn, droppingBlock, droppingShape, collisions, numberOfBlocksOnBoard, chosenBlock },
     dispatchBoardState,
-  ] = useTetrisBoard();
+  ] = useBoard();
 
   useEffect(() => {
     const startGame = () => {
@@ -58,26 +62,18 @@ export function useGameLogic() {
   
     startGame();
   }, []);
-
-  const setLeftBlock = () => {
-    console.log('move left');
-  }
-  const setRightBlock = () => {
-    console.log('move right');
-  }
-  
   
   const commitPosition = useCallback(() => {
-    console.log("you entered commitPosition");
+    // console.log("you entered commitPosition");
     if (hasCollisions(board, droppingShape, droppingRow, droppingColumn)) {
       return;
     } 
     const newBoard = structuredClone(board) as BoardShape;
 
-    console.log("drop block: "+ droppingBlock);
-    console.log("drop shape: "+ droppingShape);
-    console.log("drop row: "+ droppingRow);
-    console.log("drop column: "+ droppingColumn);
+    // console.log("drop block: "+ droppingBlock);
+    // console.log("drop shape: "+ droppingShape);
+    // console.log("drop row: "+ droppingRow);
+    // console.log("drop column: "+ droppingColumn);
 
     addShapeToBoard(
       newBoard,
@@ -97,6 +93,9 @@ export function useGameLogic() {
     });
    
     commitAudio.play();
+    const boardFormation = getFormation(renderedBoard);
+    setFormation(boardFormation);
+    setCharPositionsInFormation(getCharPositions(boardFormation));
     setIsCommitting(true);
   }, [
     board,
@@ -112,15 +111,15 @@ export function useGameLogic() {
   ]);
 
   useEffect(() => {
-    // if (!isPlaying) {
-    //   return;
-    // }
+    if (!isPlaying) {
+      return;
+    }
 
     let isPressingLeft = false;
     let isPressingRight = false;
 
    
-        console.log("upcoming blocks: "+ upcomingBlocks);
+        // console.log("upcoming blocks: "+ upcomingBlocks);
         // console.log("newupcoming blocks: "+ newUpcomingBlocks);
         let newBlock: Block;
         let indexofChosenBlock = chosenBlock !== Block.None ? upcomingBlocks.indexOf(chosenBlock) : 0;
@@ -135,7 +134,7 @@ export function useGameLogic() {
       }
 
       if (event.key === 'ArrowUp') {
-        console.log("up pressed");
+        rotateAudio.play();
         dispatchBoardState({
           type: 'move',
           isRotating: true,
@@ -183,8 +182,8 @@ export function useGameLogic() {
 //hook za lkik na AVAILABLE BLOCK  : OVAJ HOOK MI NVISE NE TREBA PROVERI
   useEffect(() => {
     const handleBlockSelection = ({ blockId, blockShape }: { blockId: number; blockShape: Block }) => {
-      console.log('Selected Block ID:', blockId);
-      console.log('Selected Block:', blockShape);
+      // console.log('Selected Block ID:', blockId);
+      // console.log('Selected Block:', blockShape);
 
       dispatchBoardState({type: 'setChosenBlock', chosenBlock: blockShape, chosenBlockId: blockId} );
     };
@@ -208,7 +207,7 @@ export function useGameLogic() {
   //hook za HOVER
   useEffect(() => {
     const handleCellHover = ({ rowIndex, colIndex }: { rowIndex: number; colIndex: number }) => {
-      console.log('Hovered Cell Row:', rowIndex + ' Hovered Cell Column:', colIndex);
+      // console.log('Hovered Cell Row:', rowIndex + ' Hovered Cell Column:', colIndex);
 
     dispatchBoardState({ type: 'drop', hoveredColumnIndex: colIndex, hoveredRowIndex: rowIndex});
     };
@@ -232,7 +231,7 @@ export function useGameLogic() {
 //hook za CELL CLICK
 useEffect(() => {
     const handleCellClick = ({ rowIndex, colIndex }: { rowIndex: number; colIndex: number }) => {
-      console.log('Clicked Cell Row:', rowIndex + ' Clicked Cell Column:', colIndex);
+      // console.log('Clicked Cell Row:', rowIndex + ' Clicked Cell Column:', colIndex);
 
       commitPosition();
     };
@@ -255,10 +254,20 @@ useEffect(() => {
 
 // hook za kraj igre
 useEffect(() => {
-    if (numberOfBlocksOnBoard  == 10) {
-      setIsPlaying(false);
-    }
-  }, [numberOfBlocksOnBoard]); 
+  const handleStopPLaying = () =>{
+    console.log('stop playing');
+    // const boardFormation = getFormation(renderedBoard);
+    // setFormation(boardFormation);
+    // setCharPositionsInFormation(getCharPositions(boardFormation));
+    setIsPlaying(false);
+    dispatchBoardState({type: 'stop'});
+  }
+  stopPlayingClickEmitter.on('stopPlay', handleStopPLaying);
+
+    return () => {
+      stopPlayingClickEmitter.off('cellClick', handleStopPLaying);
+    };
+  }, [isPlaying]); 
 
   //hook za stats
   useEffect(() => {
@@ -282,8 +291,8 @@ useEffect(() => {
     stats,
     chosenBlock,
     collisions,
-    setLeftBlock,
-    setRightBlock
+    formation,
+    charPositionsInFormation
   };
 }
 
@@ -298,40 +307,44 @@ function getNewStats(initialStats, board: BoardShape) : any{
     let rightOfCharacter = arrayOfBoard[charPosition + 1];
     let upOfCharacter = arrayOfBoard[charPosition - 7];
     let downOfCharacter = arrayOfBoard[charPosition + 7];
-
+    // console.log("char pos:"+charPosition);
+    // console.log("left pos:"+leftOfCharacter);
+    // console.log("right pos:"+rightOfCharacter);
+    // console.log("up pos:"+upOfCharacter);
+    // console.log("down pos:"+downOfCharacter);
     if (leftOfCharacter === 2) {
-      character.health += 10;
+      character.health += 30;
     } else if (leftOfCharacter === 3) {
-      character.attack += 10;
+      character.attack += 20;
     } else if (leftOfCharacter === 4) {
-      character.armor += 10;
+      character.armor += 15;
     }
 
     if (rightOfCharacter === 2) {
-      character.health += 10;
+      character.health += 30;
     } else if (rightOfCharacter === 3) {
-      character.attack += 10;
+      character.attack += 20;
     } else if (rightOfCharacter === 4) {
-      character.armor += 10;
+      character.armor += 15;
     }
 
     if (downOfCharacter === 2) {
-      character.health += 10;
+      character.health += 30;
     } else if (downOfCharacter === 3) {
-      character.attack += 10;
+      character.attack += 20;
     } else if (downOfCharacter === 4) {
-      character.armor += 10;
+      character.armor += 15;
     }
 
     if (upOfCharacter === 2) {
-      character.health += 10;
+      character.health += 30;
     } else if (upOfCharacter === 3) {
-      character.attack += 10;
+      character.attack += 20;
     } else if (upOfCharacter === 4) {
-      character.armor += 10;
+      character.armor += 15;
     }
 
-    console.log(character);
+    // console.log(character);
   }
 
   return finalCharacterArray;
@@ -391,6 +404,64 @@ function transformBoardToArray(board: BoardShape): number[] {
     }
   }
   return transformedArray;
+}
+
+export function getFormation(board: BoardShape): number[]{
+  const transformedArray: number[] = [];
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      const cell = board[i][j];
+      switch (cell) {
+        case Block.Char1:
+        case Block.Char2:
+        case Block.Char3:
+        case Block.Char4:
+        case Block.Char5:
+          transformedArray.push(1);
+          break;
+        case Block.I_R:
+        case Block.L_R:
+        case Block.O_R:
+        case Block.T_R:
+        case Block.Z_R:
+          transformedArray.push(3);
+          break;
+        case Block.I_G:
+        case Block.L_G:
+        case Block.O_G:
+        case Block.T_G:
+        case Block.Z_G:
+          transformedArray.push(2);
+          break;
+        case Block.I_B:
+        case Block.L_B:
+        case Block.O_B:
+        case Block.T_B:
+        case Block.Z_B:
+          transformedArray.push(4);
+          break;
+        case EmptyCell.Empty:
+          transformedArray.push(0);
+          break;
+        default:
+          transformedArray.push(0);
+          break;
+      }
+    }
+  }
+  return transformedArray;
+}
+
+export function getCharPositions(array: number[]): number[]{
+  const positions: number[] = [];
+    
+    for (let i = 0; i < array.length; i++) {
+        if (array[i] === 1) {
+            positions.push(i);
+        }
+    }
+    return positions;
 }
 
 

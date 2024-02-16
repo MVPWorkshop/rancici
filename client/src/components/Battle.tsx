@@ -1,93 +1,113 @@
-// interface BattleComponentProps {
-//     battleId: number;
-//     started: boolean;
-//     joined: boolean;
-//     setBattleIdValue: (value: number) => void;
-//   }
-
-//   const BattleComponent: React.FC<BattleComponentProps> = ({ battleId, started, joined, setBattleIdValue }) => {
-
-//     const handleClick = () => {
-//       setBattleIdValue(battleId);
-//     };
-
-//     const getStatus = () => {
-//       if (started) {
-//           return { status: 'started', color: 'green' };
-//       } else if (joined) {
-//           return { status: 'joined', color: 'orange' };
-//       } else {
-//           return { status: 'created', color: 'blue' };
-//       }
-//   };
-
-//     return (
-//       <div>
-//         <p onClick={handleClick}>
-//             Battle with id: <span style={{ color: getStatus().color }}>{battleId}</span>
-//             , status: <span style={{ color: getStatus().color }}>{getStatus().status}</span>
-//         </p>
-//       </div>
-//     );
-//   };
-
-// export default BattleComponent
-
-// import { Entity , getComponentValue, getComponentEntities} from "@dojoengine/recs";
+import { Entity , getComponentValue, getComponentEntities} from "@dojoengine/recs";
 import { useEffect, useState } from "react";
-// import "./App.css";
-// import { useDojo } from "../dojo/useDojo";
-// import { Account, BigNumberish, RpcProvider } from "starknet";
-// import { CLIENT_RENEG_LIMIT } from "tls";
-// // import BattleComponent from "./Battle";
-// import { battleEventEmitter } from '../dojo/createSystemCalls';
-// import { useComponentValue } from "@latticexyz/react";
+import { useDojo } from "../dojo/useDojo";
 import Board from "./Board";
 import Countdown from "../components/Countdown.tsx";
-// import { EmptyCell } from "../types";
 import AvailableBlocks from "./AvailableBlocks";
 import { useGameLogic } from "../hooks/useGameLogic";
 import CharStats from "./CharStats";
 import * as utils from "../utils/index.ts";
+import { PreBattleState } from "../types";
+import { start } from "repl";
+import Legend from "../components/Legend";
+import { EventEmitter } from 'events';
+import { battleEventEmitter } from '../dojo/createSystemCalls';
 
-function generateStatsArray(numStats) {
-  const statsArray = [];
+export const stopPlayingClickEmitter = new EventEmitter();
 
-  for (let i = 0; i < numStats; i++) {
-    const stat = {
-      Health: Math.floor(Math.random() * 100) + 1,
-      Armor: Math.floor(Math.random() * 50) + 1,
-      Stamina: Math.floor(Math.random() * 200) + 1,
-    };
-    statsArray.push(stat);
-  }
-
-  return statsArray;
-}
 
 function BattleComponent({ stateManager, startBattle }) {
-  // const {
-  //     setup: {
-  //         systemCalls: { createBattle, joinBattle, startBattle },
-  //         clientComponents: { Backpack, Battle, BattleConfig, Item },
-  //     },
-  //     account,
-  //     masterAccount,
-  //     secondAccount
-  // } = useDojo();
+  const {
+    setup: {
+        systemCalls: { createBattle, joinBattle, startBattleSC, commitFormation,revealFormation },
+        clientComponents: { Character, Battle, BattleConfig },
+    },
+    account,
+    masterAccount,
+    secondAccount
+} = useDojo();
+const [battleId, setBattleId] = useState(-1);
+const [battleEntities, setBattleEntities] = useState<any[]>(Array.from(getComponentEntities(Battle)));
 
-  const { board, isPlaying, upcomingBlocks, collisions, stats, chosenBlock } =
-    useGameLogic();
+useEffect(() => {
+  const handleNewBattleCreated= () => {
+     var entities = Array.from(getComponentEntities(Battle));
+     setBattleEntities(entities);
+      const index = entities.length -1;
+      const battleeeid = getComponentValue(Battle, entities[index]).id;
+      setBattleId(battleeeid);
+  };
+  battleEventEmitter.on('newBattleCreated', handleNewBattleCreated);
+
+  return () => {
+      battleEventEmitter.off('newBattleCreated', handleNewBattleCreated);
+  };
+}, []);
+
+//FOR TESTING PURPOSES:
+// useEffect(() => {
+//   createBattle(masterAccount);
+// }, []);
+
+// useEffect(() => {
+//   if(battleId !== -1){
+// console.log("join");
+//     joinBattle(secondAccount, battleId);
+//   }
+// }, [battleId]);
+
+const [state, setState] = useState(PreBattleState.Awaiting_Commitment);
+
+const moveToTheBattlePage = (async () => {
+  stateManager.updateState({ countdown: { visible: false } });
+  await sendMove(stateManager, "full_move_info...");
+  stateManager.updateState({
+    page: "Battle",
+    pageState: {},
+    board: { p1: board },
+    stats: { p1: stats },
+  });
+});
+const handleClick = () => {
+  switch(state){
+    case PreBattleState.Awaiting_Commitment:
+      stopPlayingClickEmitter.emit('stopPlay');
+      setState(PreBattleState.Awaiting_Reveal);
+      commitFormation(masterAccount, battleId);
+      break;
+    case PreBattleState.Awaiting_Reveal:
+      setState(PreBattleState.Reveal_Done);
+      console.log("new form: "+formation);
+      revealFormation(masterAccount, battleId, formation, charPositionsInFormation);
+      break;
+    case PreBattleState.Reveal_Done:
+      startBattleSC(masterAccount, battleId);
+      moveToTheBattlePage();
+      console.log('game started');
+      break;
+  }
+ 
+};
+
+const { board, isPlaying, chosenBlock, collisions, stats, formation, charPositionsInFormation } = useGameLogic();
+
+console.log("board formation"+formation);
+console.log("charposition: "+charPositionsInFormation);
 
   return (
     <div className="game-container-wrapper-2">
       <div className="game-container-wrapper">
         <div className="game-container">
+        <Legend/>
           <Board currentBoard={board} collidedCells={collisions} />
           <div className="controls">
-            <div className="arrowLeft"></div>
-            <AvailableBlocks avaliableBlock={chosenBlock} />
-            <div className="arrowRight"></div>
+          {isPlaying ? (
+          <>
+        <div className="arrowLeft"></div>
+        <AvailableBlocks avaliableBlock={chosenBlock} />
+        <div className="arrowRight"></div>
+        </>
+        ) : <></>}
           </div>
           <CharStats stats={stats} />
         </div>
@@ -103,18 +123,9 @@ function BattleComponent({ stateManager, startBattle }) {
           <Countdown stateManager={stateManager}></Countdown>
           <button
             className="start-battle-btn"
-            onClick={async () => {
-              stateManager.updateState({ countdown: { visible: false } });
-              await sendMove(stateManager, "full_move_info...");
-              stateManager.updateState({
-                page: "Battle",
-                pageState: {},
-                board: { p1: board },
-                stats: { p1: stats },
-              });
-            }}
+            onClick={handleClick}
           >
-            START BATTLE
+            {state}
           </button>
         </div>
       </div>
