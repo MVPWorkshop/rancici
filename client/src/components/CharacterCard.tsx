@@ -7,20 +7,22 @@ import "../style/Battle.css";
 const CharacterCard = ({ pIdx, chIdx, stateManager }) => {
   const [isActive, setActiveStatus] = useState(false);
   const [stats, setStats] = useState({
-    health: 400,
+    health: 150,
     attack: 230,
     armor: 383,
   });
 
+  const [health, setHealth] = useState(150);
   const player = `P${pIdx}`;
   const ch = `Ch${chIdx}`;
 
   useEffect(() => {
-    visualisation.setCallback("onStepStart", (battleState) => {
+    visualisation.setCallback("onHitLand", (battleState) => {
       try {
         const newStats = battleState.step[player][ch].stats;
         setActiveStatus(characterIsActive(battleState, pIdx, chIdx));
         setStats(newStats);
+        setHealth(newStats.health);
       } catch (err) {
         console.log("ERR", { battleState, err, player, ch });
       }
@@ -38,7 +40,7 @@ const CharacterCard = ({ pIdx, chIdx, stateManager }) => {
         ></img>
         <div>
           Health: <br></br>
-          {stats.health}
+          {health}
         </div>
       </div>
     </div>
