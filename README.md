@@ -75,11 +75,11 @@ Create and join will be perfomed automatically by Madara in the upcoming future 
 
 ## Usage
 
-Check [contracts](./contracts/README.md) and [client](./client/readme.md) sections for detailed information on how to setup and run the project.
+Check [Contracts](./contracts/README.md) and [Client](./client/readme.md) sections for detailed information on how to setup and run the project.
 
 ## Controls
 
-For Cli battle commands and controls look at [Battle Steps Commands](./contracts/README.md#battle-steps-commands-localy)
+For CLI battle commands and controls look at [Battle Steps Commands](./contracts/README.md#battle-steps-commands-localy).
 
 ## Further Directions
 
