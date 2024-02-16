@@ -33,10 +33,10 @@
 
 // export default BattleComponent
 
-// import { Entity , getComponentValue, getComponentEntities} from "@dojoengine/recs";
+import { Entity , getComponentValue, getComponentEntities} from "@dojoengine/recs";
 import { useEffect, useState } from "react";
 // import "./App.css";
-// import { useDojo } from "../dojo/useDojo";
+import { useDojo } from "../dojo/useDojo";
 // import { Account, BigNumberish, RpcProvider } from "starknet";
 // import { CLIENT_RENEG_LIMIT } from "tls";
 // // import BattleComponent from "./Battle";
@@ -51,6 +51,9 @@ import { PreBattleState } from "../types";
 import { start } from "repl";
 import Legend from "../components/Legend";
 import { EventEmitter } from 'events';
+import { getEvents, setComponentsFromEvents, getEntityIdFromKeys} from "@dojoengine/utils";
+import { battleEventEmitter } from '../dojo/createSystemCalls';
+
 
 export const stopPlayingClickEmitter = new EventEmitter();
 
@@ -65,32 +68,82 @@ function BattleComponent({startBattle}) {
     //     secondAccount
     // } = useDojo();
 
-    const [state, setState] = useState(PreBattleState.Ready_To_Commit);
+        const {
+        setup: {
+            systemCalls: { createBattle, joinBattle, startBattleSC, commitFormation,revealFormation },
+            clientComponents: { Character, Battle, BattleConfig },
+        },
+        account,
+        masterAccount,
+        secondAccount
+    } = useDojo();
+    const [battleId, setBattleId] = useState(-1);
+    const [battleEntities, setBattleEntities] = useState<any[]>(Array.from(getComponentEntities(Battle)));
+
+    useEffect(() => {
+      const handleNewBattleCreated= () => {
+         var entities = Array.from(getComponentEntities(Battle));
+         setBattleEntities(entities);
+          // console.log(entities);
+          const index = entities.length -1;
+          // console.log(index);
+          // console.log(entities[index]);
+          const battleeeid = getComponentValue(Battle, entities[index]).id;
+          setBattleId(battleeeid);
+          // joinBattle(secondAccount, entities[index]);
+      };
+      battleEventEmitter.on('newBattleCreated', handleNewBattleCreated);
+
+      return () => {
+          battleEventEmitter.off('newBattleCreated', handleNewBattleCreated);
+      };
+  }, []);
+
+    useEffect(() => {
+      createBattle(masterAccount);
+    }, []);
+
+    useEffect(() => {
+      if(battleId !== -1){
+console.log("join");
+        joinBattle(secondAccount, battleId);
+      }
+    }, [battleId]);
+
+    const [state, setState] = useState(PreBattleState.Awaiting_Commitment);
+
+//     const entity = getEntityIdFromKeys ([BigInt(battleId
+//   ] )as Entity;
+
+//     const val = getComponentValue(Battle, entity);
+// console.log("VALUE: "+val);
+    // setBattleId(val.id);
 
     const handleClick = () => {
       switch(state){
-        case PreBattleState.Ready_To_Commit:
-          console.log('enter case');
+        case PreBattleState.Awaiting_Commitment:
           stopPlayingClickEmitter.emit('stopPlay');
-          setState(PreBattleState.Commited);
-          //commit f-ja
+          setState(PreBattleState.Awaiting_Reveal);
+          commitFormation(masterAccount, battleId);
           break;
-        case PreBattleState.Commited:
-          setState(PreBattleState.Revealed);
-          //reveal f-ja
+        case PreBattleState.Awaiting_Reveal:
+          setState(PreBattleState.Reveal_Done);
+          revealFormation(masterAccount, battleId, formation.toString(), charPositionsInFormation.toString());
           break;
-        case PreBattleState.Revealed:
-          startBattle();
+        case PreBattleState.Reveal_Done:
+          startBattleSC(masterAccount, battleId);
+          //startBattle();
           console.log('game started');
           break;
       }
      
     };
 
+    const { board, isPlaying, chosenBlock, collisions, stats, formation, charPositionsInFormation } = useGameLogic();
 
-    const { board, isPlaying, chosenBlock, collisions, stats, setLeftBlock, setRightBlock } = useGameLogic();
-console.log(isPlaying);
-  return (
+    console.log("board formation"+formation);
+    console.log("charposition: "+charPositionsInFormation);
+    return (
     <div className="game-container">
       <Legend/>
       <Board currentBoard={board} collidedCells={collisions} />

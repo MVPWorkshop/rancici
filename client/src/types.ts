@@ -1,7 +1,7 @@
 export enum PreBattleState{
-  Ready_To_Commit = 'COMMIT',
-  Commited = 'REVEAL',
-  Revealed = 'START GAME'
+  Awaiting_Commitment = 'COMMIT',
+  Awaiting_Reveal = 'REVEAL',
+  Reveal_Done = 'START GAME'
 }
 
 export enum Block {

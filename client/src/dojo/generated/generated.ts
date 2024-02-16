@@ -2,6 +2,7 @@
 
 import { Account, BigNumberish } from "starknet";
 import { DojoProvider } from "@dojoengine/core";
+import { defineComponent, Type as RecsType, World } from "@dojoengine/recs";
 
 export type IWorld = Awaited<ReturnType<typeof setupWorld>>;
 
@@ -56,7 +57,51 @@ export async function setupWorld(provider: DojoProvider) {
                 throw error;
             }
         };
-        return { createBattle, joinBattle, startBattle };
+
+        const commitFormation = async ({
+            account,
+            battleId,
+            formationHash
+        }: {
+            account: Account;
+            battleId: BigNumberish;
+            formationHash: BigNumberish;
+        }) => {
+            try {
+                return await provider.execute(account, contract_name, "commitFormation", [
+                    battleId,
+                    formationHash
+                ]);
+            } catch (error) {
+                console.error("Error executing commitFormation:", error);
+                throw error;
+            }
+        };
+        
+        const revealFormation = async ({
+            account,
+            battleId,
+            formation,
+            characterPositions
+        }: {
+            account: Account;
+            battleId: BigNumberish;
+            formation: BigNumberish;
+            characterPositions: BigNumberish;
+        }) => {
+            try {
+                return await provider.execute(account, contract_name, "revealFormation", [
+                    battleId,
+                    formation,
+                    characterPositions
+                ]);
+            } catch (error) {
+                console.error("Error executing revealFormation:", error);
+                throw error;
+            }
+        };
+
+        return { createBattle, joinBattle, startBattle, commitFormation, revealFormation };
     }
     return {
         actions: actions(),
