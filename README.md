@@ -24,8 +24,16 @@ After both players send their formations, the battle starts. Battle is run autom
 Automatic battle is run until one of the players has no live characters left or 50 turns are made, at which point player with most health (sum of all characters health) wins
 
 ## Features
-TBD
+PVP battle game with following features:
+- Create battle
+- Join battle
+- Commit formation
+- Reveal formation
+- Start battle
+Create and join will be done autoatically by Madara in the future vesion.
+
 ## Usage
-TBD
+Check [contracts](./contracts/README.md) and [client](./client/readme.md) for more details.
+
 ## Controls
-TBD
+For Cli battle commands and controls look at [Battle Steps Commands](./contracts/README.md#battle-steps-commands-localy)
