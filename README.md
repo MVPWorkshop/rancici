@@ -75,7 +75,7 @@ Create and join will be perfomed automatically by Madara in the upcoming future 
 
 ## Usage
 
-Check [contracts](./contracts/README.md) and [client](./client/readme.md) for more details.
+Check [contracts](./contracts/README.md) and [client](./client/readme.md) sections for detailed information on how to setup and run the project.
 
 ## Controls
 
@@ -83,6 +83,6 @@ For Cli battle commands and controls look at [Battle Steps Commands](./contracts
 
 ## Further Directions
 
-We are exploring couple of main directions for the Rancici Universe, some being:
+We are exploring couple of main further directions for the Rancici Universe, some being:
 
 - Multiplayer mode, Multi-round matches, Community-driven tournaments/leagues, ...
