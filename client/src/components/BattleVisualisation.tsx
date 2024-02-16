@@ -1,55 +1,53 @@
 import { useEffect } from "react";
 
+import Cell from "../components/Cell";
+import { Block } from "../types.ts";
+import * as constants from "../utils/constants";
+
 import "../style/Battle.css";
 
 const BattleVisualisation = ({ stateManager }) => {
   useEffect(() => {}, []);
 
+  const GRID_INDICES = Array.from({ length: constants.GRID_H }, (_, i) => i);
+
   return (
     <div className="BattleVisualisation">
-      <div className="Grid-P-1">
-        <div id="Rancici-P-1-Ch-1" className="Ch">
-          <img className="ChImg" src="./characters/ch1.png"></img>
-        </div>
-        <hr></hr>
-        <div id="Rancici-P-1-Ch-2" className="Ch">
-          <img className="ChImg" src="./characters/ch2.png"></img>
-        </div>
-        <hr></hr>
-        <div id="Rancici-P-1-Ch-3" className="Ch">
-          <img className="ChImg" src="./characters/ch3.png"></img>
-        </div>
-        <hr></hr>
-        <div id="Rancici-P-1-Ch-4" className="Ch">
-          <img className="ChImg" src="./characters/ch4.png"></img>
-        </div>
-        <hr></hr>
-        <div id="Rancici-P-1-Ch-5" className="Ch">
-          <img className="ChImg" src="./characters/ch5.png"></img>
+      <div className="Metadata">
+        <div className="MatchId">
+          <div className="Text">Match ID:</div>
+          <div className="Value">3738141</div>
         </div>
       </div>
-      <div className="Grid-P-2">
-        <div id="Rancici-P-2-Ch-1" className="Ch">
-          <img className="ChImg" src="./characters/ch6.png"></img>
+      <div className="Container1">
+        <div className="GridWrapper">
+          {GRID_INDICES.map((rowIdx) => (
+            <div className="row" key={`${rowIdx}`}>
+              {GRID_INDICES.map((colIdx) => (
+                <Cell
+                  type={stateManager.state.board.p1[rowIdx][colIdx]}
+                  isCollided={false}
+                  playerId={1}
+                />
+              ))}
+            </div>
+          ))}
         </div>
-        <hr></hr>
-        <div id="Rancici-P-2-Ch-2" className="Ch">
-          <img className="ChImg" src="./characters/ch3.png"></img>
-        </div>
-        <hr></hr>
-        <div id="Rancici-P-2-Ch-3" className="Ch">
-          <img className="ChImg" src="./characters/ch7.png"></img>
-        </div>
-        <hr></hr>
-        <div id="Rancici-P-2-Ch-4" className="Ch">
-          <img className="ChImg" src="./characters/ch2.png"></img>
-        </div>
-        <hr></hr>
-        <div id="Rancici-P-2-Ch-5" className="Ch">
-          <img className="ChImg" src="./characters/ch1.png"></img>
-        </div>
-      </div>
 
+        <div className="GridWrapper">
+          {GRID_INDICES.map((rowIdx) => (
+            <div className="row" key={`${rowIdx}`}>
+              {GRID_INDICES.map((colIdx) => (
+                <Cell
+                  type={stateManager.state.board.p1[rowIdx][colIdx]}
+                  isCollided={false}
+                  playerId={2}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
       <img id="Missile" className="MissileImg" src="fire.gif" hidden></img>
     </div>
   );

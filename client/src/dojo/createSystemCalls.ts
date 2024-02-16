@@ -114,7 +114,7 @@ export function createSystemCalls(
         }
     }
 
-    const revealFormation = async (account: Account, battleId: BigNumberish, formation: BigNumberish, characterPositions: BigNumberish) => {
+    const revealFormation = async (account: Account, battleId: BigNumberish, formation: number[], characterPositions: number[]) => {
         try {
             const { transaction_hash } = await client.actions.revealFormation({
                 account, battleId, formation, characterPositions

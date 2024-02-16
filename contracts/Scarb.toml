@@ -22,13 +22,11 @@ private_key = "0x33003003001800009900180300d206308b0070db00121318d17b5e6262150b"
 world_address = "0x4ebcc658b6fce7b61303e2137cdd8cab4e93728e0872ee0ba3be5432ee0b4fe"
 
 [tool.dojo.world]
-name = "Dojo starter"
-description = "The official Dojo Starter guide, the quickest and most streamlined way to get your Dojo Autonomous World up and running. This guide will assist you with the initial setup, from cloning the repository to deploying your world."
-cover_uri = "file://assets/cover.png"
-icon_uri = "file://assets/icon.png"
-website = "https://github.com/dojoengine/dojo-starter"
+name = '''Dojo starter battle"
+description = "PvP battle game. Players can create or join battles
+When players are matched each player get random positions of 5 charaters (in 7x7 grid) and 10 tetris shapes (with random colours) which boost default character stats (health, attack, armor).
+Each player chooses his formation of (max 5) shapes and commits to it (posting hash on chain). After both players commit, they need to send actual formation to the chain.
+After both players send their formations, the battle starts. Battle is run automatically where each players's first live character attacks first live character of other player.
+Automatic battle is run until one of the players has no live characters left or 50 turns are made, at which point player with most health (sum of all characters health) wins.'''
 
-[tool.dojo.world.socials]
-x = "https://x.com/ohayo_dojo"
-discord = "https://discord.gg/FB2wR6uF"
-github = "https://github.com/dojoengine/dojo-starter"
+

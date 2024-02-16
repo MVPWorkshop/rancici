@@ -1,6 +1,8 @@
 import * as utils from "../utils/index.ts";
 import * as visualisation from "./visualisation.ts";
-const STEP_COUNT = 21;
+import * as _mockData from "./mock-data.ts";
+
+const STEP_COUNT = 2;
 
 export const run = async (stateManager, matchId) => {
   await utils.delay(400);
@@ -27,12 +29,16 @@ export const run = async (stateManager, matchId) => {
     }
   }, 310);
 
-  const steps = [];
-  for (let stepIdx = 0; stepIdx < 10; ++stepIdx) {
-    steps.push(randStep());
-  }
+  // const steps = [];
+  // for (let stepIdx = 0; stepIdx < STEP_COUNT; ++stepIdx) {
+  //   steps.push(randStep());
+  // }
 
+  const steps = _mockData.build();
+
+  console.log({ steps });
   const battleState = {
+    finished: false,
     stepIdx: 0,
     step: steps[0],
     steps,
@@ -45,8 +51,6 @@ export const run = async (stateManager, matchId) => {
 
     missileAnimationFinished: true,
   };
-
-  console.log({ battleState });
 
   visualisation.setBattleState(battleState);
 

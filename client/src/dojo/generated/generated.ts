@@ -86,14 +86,16 @@ export async function setupWorld(provider: DojoProvider) {
         }: {
             account: Account;
             battleId: BigNumberish;
-            formation: BigNumberish;
-            characterPositions: BigNumberish;
+            formation: number[];
+            characterPositions: number[];
         }) => {
             try {
                 return await provider.execute(account, contract_name, "revealFormation", [
                     battleId,
-                    formation,
-                    characterPositions
+                    formation.length,
+                    ...formation,
+                    characterPositions.length,
+                    ...characterPositions
                 ]);
             } catch (error) {
                 console.error("Error executing revealFormation:", error);
