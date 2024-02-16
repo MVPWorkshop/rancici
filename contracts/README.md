@@ -93,3 +93,54 @@ You can try also, but player accounts need to be cairo v0 (You can use Starkli v
 
 To run torii (and check battle and character models) on goerli testnet use this command:
 `torii -w 0x4ebcc658b6fce7b61303e2137cdd8cab4e93728e087e0ba3be5432ee0b4fe --rpc https://starknet-goerli.g.alchemy.com/v2/<alchemy-key> -s 950765`
+
+Expected torii output of battleModel query on goerli testnet:
+```graphql
+{
+  "data": {
+    "battleModels": {
+      "edges": [
+        {
+          "node": {
+            "id": 1,
+            "player1": "0x75e27854cdb3645d64b019e931db8a9a151ea2a7339936a8d344ff865acec3d",
+            "player2": "0x232663eff47d4449cd4db21b9f878c20185b8e6094c2ae358f8e8fe91b127ab",
+            "player1_formation_revealed": true,
+            "player2_formation_revealed": true,
+            "player1_formation_hash": "0x12342131",
+            "player2_formation_hash": "0x982142131",
+            "status": "FINISHED",
+            "winner": "0x75e27854cdb3645d64b019e931db8a9a151ea2a7339936a8d344ff865acec3d"
+          }
+        },
+        {
+          "node": {
+            "id": 2,
+            "player1": "0x232663eff47d4449cd4db21b9f878c20185b8e6094c2ae358f8e8fe91b127ab",
+            "player2": "0x0",
+            "player1_formation_revealed": false,
+            "player2_formation_revealed": false,
+            "player1_formation_hash": "0x0",
+            "player2_formation_hash": "0x0",
+            "status": "CREATED",
+            "winner": "0x0"
+          }
+        },
+        {
+          "node": {
+            "id": 0,
+            "player1": "0x75e27854cdb3645d64b019e931db8a9a151ea2a7339936a8d344ff865acec3d",
+            "player2": "0x75e27854cdb3645d64b019e931db8a9a151ea2a7339936a8d344ff865acec3d",
+            "player1_formation_revealed": false,
+            "player2_formation_revealed": false,
+            "player1_formation_hash": "0x12342131",
+            "player2_formation_hash": "0x0",
+            "status": "AWAITING_COMMITMENT",
+            "winner": "0x0"
+          }
+        }
+      ]
+    }
+  }
+}
+```
