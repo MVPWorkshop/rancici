@@ -1,5 +1,7 @@
 import * as utils from "../utils/index.ts";
 import * as visualisation from "./visualisation.ts";
+import * as _mockData from "./mock-data.ts";
+
 const STEP_COUNT = 2;
 
 export const run = async (stateManager, matchId) => {
@@ -27,11 +29,14 @@ export const run = async (stateManager, matchId) => {
     }
   }, 310);
 
-  const steps = [];
-  for (let stepIdx = 0; stepIdx < STEP_COUNT; ++stepIdx) {
-    steps.push(randStep());
-  }
+  // const steps = [];
+  // for (let stepIdx = 0; stepIdx < STEP_COUNT; ++stepIdx) {
+  //   steps.push(randStep());
+  // }
 
+  const steps = _mockData.build();
+
+  console.log({ steps });
   const battleState = {
     finished: false,
     stepIdx: 0,

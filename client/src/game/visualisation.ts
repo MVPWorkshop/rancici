@@ -63,6 +63,8 @@ export const run = async (stateManager) => {
       updateClassNames({
         target: "Ch-Target Ch-Target-Hit",
       });
+      executeEventCallbacks("onHitLand");
+      // console.log({ onHitLand: "called" });
     }
 
     if (battleState.missileAnimationFinished && battleState.stageStepIdx > 60) {
@@ -87,6 +89,7 @@ export const run = async (stateManager) => {
       }
       battleState.stepIdx = nextStepIdx;
       battleState.step = battleState.steps[nextStepIdx];
+      console.log("--->", battleState.step);
       battleState.attacker = battleState.step.attacker;
       battleState.target = battleState.step.target;
 
@@ -244,6 +247,7 @@ const getActiveChars = (step) => {
 
 const _callbacks = {
   onStepChange: [],
+  onHitLand: [],
   onStepStart: [],
   onBattleFinished: [],
   onFinish: [],

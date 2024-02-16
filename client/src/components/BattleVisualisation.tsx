@@ -13,6 +13,12 @@ const BattleVisualisation = ({ stateManager }) => {
 
   return (
     <div className="BattleVisualisation">
+      <div className="Metadata">
+        <div className="MatchId">
+          <div className="Text">Match ID:</div>
+          <div className="Value">3738141</div>
+        </div>
+      </div>
       <div className="Container1">
         <div className="GridWrapper">
           {GRID_INDICES.map((rowIdx) => (
