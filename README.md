@@ -31,6 +31,7 @@ It has been built using:
   - [Client](./client/readme.md)
 - [Usage](#usage)
 - [Controls](#controls)
+- [Further Directions](#further-directions)
 
 ## Detailed Game Flow
 
@@ -71,6 +72,6 @@ Check [contracts](./contracts/README.md) and [client](./client/readme.md) for mo
 
 For Cli battle commands and controls look at [Battle Steps Commands](./contracts/README.md#battle-steps-commands-localy)
 
-## Further directions
+## Further Directions
 
 Will include: Multiplayer mode, Multi-round matches, Community-driven tournaments and leagues, and much more...
