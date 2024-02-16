@@ -1,37 +1,67 @@
-# Rancici Battle Game
+# Rancici: Starknet Winter Hackathon
 
 <img src="./readme-assets/rancici-home.png" alt="Rancici Logo" width="2000"/>
 
+## Overview
+
+**Rancici** is an on-chain PvP battle game imagined in a **Futuristic Naruto Style**.
+
+Players enter matches in which they get:
+
+- Grid (7x7) on which 5 random characters from the Rancici Universe are placed
+  - Where each character has: Health, Armor, and Attack statistic
+- Different shapes (10) that have one of 3 effects on character statistics if the shape occupies one of his adjacent cells
+  - These shapes can be rotated, and cannot overlap
+
+**Goal of the Game** is to find the optimal positioning of the shapes, given the character placement, and the opponent they have encountered.
+
+## Build Description
+
+It has been built using:
+
+- **Dojo Engine tooling** (Sozo, Katana, Torii, NPM package: Create Burner) for the Game's contract development/test/deployment and Front connection
+- **Argent Mobile Wallet** as the primary user wallet
+
 ## Table of Contents
 
-- [Description](#description)
-- [Features](#features)
+- [Detailed Game Flow](#detailed-game-flow)
+- [Detailed Automatic Battle Rules](#detailed-automatic-battle-rules)
 - [Installation](#installation)
   - [Contracts](./contracts/README.md)
   - [Client](./client/readme.md)
 - [Usage](#usage)
 - [Controls](#controls)
 
-## Description
+## Detailed Game Flow
 
-PvP battle game (Futuristic Naruto Style). Players can create or join battles.
+1. Player1 creates a match (open to everyone, or only to someone specific)
+2. Player2 choses to join one of the available matches
+3. Both players have a bounded time period in which they need to make shape placement decisions
+4. Both players commit on-chain to the move they have made (to prevent one player making alternations when they see the opponent's move)
+5. Both players reveal on-chain the move they have made
+6. Automatic battle is carried out under clear rules defined in the contract, and the winner is decided on-chain
 
-When players are matched in battle, each player get random positions of 5 charaters (in 7x7 grid) and 10 tetris shapes (with random colours) which boost default character stats (health, attack, armor).
+Bellow is an illustration of the view that is presented to players after they have been matched (Step 3):
+<img src="./readme-assets/rancici-pre-battle-view.png" alt="Rancici PreBattle" width="2000"/>
 
-Each player chooses his formation of (max 5) shapes and commits to it (posting hash on chain). After both players commit to their formation, they need to send actual formation to the chain.After both players send their formations, the battle starts.
+## Detailed Automatic Battle Rules
 
 Battle is run automatically where each players's first alive character attacks the first alive character of the other player in loop. Automatic battle is run until one of the players has no live characters left or 50 turns (each) are made, at which point player with most health (sum of all characters health) wins.
+
+Snapshot of one battle visualisation (Player2.Character4 is attacking Player1.Character5)
+<img src="./readme-assets/rancici-battle-view.png" alt="Rancici Battle" width="2000"/>
 
 ## Features
 
 PVP battle game with following features:
 
-- Create battle
-- Join battle
-- Commit formation
-- Reveal formation
-- Start battle
-  Create and join will be done autoatically by Madara in the future vesion.
+- Create battle (done by Player1)
+- Join battle (done by Player2)
+- Commit formation (Commitment stage - done by both players)
+- Reveal formation (Reveal stage - done by both players)
+- Start battle (Winner is decided in this call)
+
+Create and join will be perfomed automatically by Madara in the upcoming future vesions.
 
 ## Usage
 
@@ -40,3 +70,7 @@ Check [contracts](./contracts/README.md) and [client](./client/readme.md) for mo
 ## Controls
 
 For Cli battle commands and controls look at [Battle Steps Commands](./contracts/README.md#battle-steps-commands-localy)
+
+## Further directions
+
+Will include: Multiplayer mode, Multi-round matches, Community-driven tournaments and leagues, and much more...
