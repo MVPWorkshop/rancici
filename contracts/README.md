@@ -1,11 +1,67 @@
+# Rancici Battle Game
+PvP battle game. Players can create or join battles.
+
+When players are matched in battle, each player get random positions of 5 charaters (in 7x7 grid) and 10 tetris shapes (with random colours) which boost default character stats (health, attack, armor).
+
+Each player chooses his formation of (max 5) shapes and commits to it (posting hash on chain). After both players commit to their formation, they need to send actual formation to the chain.
+
+After both players send their formations, the battle starts. Battle is run automatically where each players's first live character attacks first live character of other player.
+
+Automatic battle is run until one of the players has no live characters left or 50 turns are made, at which point player with most health (sum of all characters health) wins
+
 # Contracts
 
+## Battle Pre-requisites:
+1. instal dojo (dojoup)
+2. sozo build
+3. run katana in different terminal (command: `katana --disable-fee`)
+4. sozo migrate
+5. run `bash scripts/default_auth.sh` to authenticate battle contract (so everyone can call it)
+5. (Optional) run torii in different terminal (command: 
+`torii --world 0x4ebcc658b6fce7b61303e2137cdd8cab4e93720872ee0ba3be5432ee0b4fe`)
+6. (Optional) After each battle step you can check the status of battleModel in torii on endpoint:
+ http://0.0.0.0:8081/graphql
+ and this query
+ ```graphql
+ query {
+  battleModels {
+    edges {
+      node {
+        id
+        player1
+        player2
+        player1_formation_revealed
+        player2_formation_revealed
+        player1_formation_hash
+        player2_formation_hash
+        status
+        winner
+      }
+    }
+  }
+}
+```
+7. (Optional) You can also check the status of characterModel (after reveal step) in torii with this query:
+```graphql
+query {
+  characterModels {
+    edges {
+      node {
+        id
+        battleId
+        owner
+        health
+        armor
+        attack
+        dead
+      }
+    }
+  }
+}
+```
 
-## Battle Commands
+## Battle Steps Commands (localy)
 ```sh
- # Authenticate battle contract (so everyone can call it)
- bash scripts/default_auth.sh
- 
  # Create battle
  sozo execute 0x117c911e19bc749a741066e1f210ce5673283ab2a745b2cd0ebfa237783448 createBattle
 
@@ -28,3 +84,12 @@
  sozo execute 0x117c911e19bc749a741066e1f210ce5673283ab2a745b2cd0ebfa237783448 startBattle --calldata 0
 
 ```
+## Deployed Contracts on Goerli Testnet
+World contract deployed to: [0x4ebcc658b6fce7b61303e2137cdd8cab4e93720872ee0ba3be5432ee0b4fe](https://goerli.voyager.online/contract/0x04ebcc658b6fce7b61303e2137cdd8cab4e93728e0872ee0ba3be5432ee0b4fe)
+Battle system (actions) contract deployed to: [0x117c911e19bc749a741066e1f210ce5673283ab2a745b2cd0ebfa237783448](https://goerli.voyager.online/contract/0x117c911e19bc749a741066e1f210ce5673283ab2a745b2cd0ebfa237783448) 
+
+Battle succesfully tested on goerli testnet (check World and Battle contract Account calls in Voyager). 
+You can try also, but player accounts need to be cairo v0 (You can use Starkli v0.1.20 to create braavos account). e.g. [0x075e27854cdb3645d64b019e931db8a9a151ea2a7339936a8d344ff865acec3d](https://goerli.voyager.online/contract/0x075e27854cdb3645d64b019e931db8a9a151ea2a7339936a8d344ff865acec3d)
+
+To run torii (and check battle and character models) on goerli testnet use this command:
+`torii -w 0x4ebcc658b6fce7b61303e2137cdd8cab4e93728e087e0ba3be5432ee0b4fe --rpc https://starknet-goerli.g.alchemy.com/v2/<alchemy-key> -s 950765`

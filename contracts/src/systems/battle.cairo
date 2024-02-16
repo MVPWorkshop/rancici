@@ -156,6 +156,8 @@ mod battle {
             // TODO check hash (if it mathces provided formation) and check random characterPositions (if correct)
             let charLength = characterPositions.len();
             assert(charLength == 5, 'Invalid character length');
+            let formationLength = formation.len();
+            assert(formationLength == 49, 'Invalid formation length');
             //check if characters in right position in formation
             let mut i = 0;
             let validationCharPositions = characterPositions.clone();
