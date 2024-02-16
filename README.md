@@ -21,8 +21,8 @@ Players enter matches in which they get:
 
 #### It has been built using:
 
-- **Dojo Engine tooling** (Sozo, Katana, Torii, NPM package: Create Burner) for the Game's contract development/test/deployment and Front connection
-- **Argent Mobile Wallet** as the primary user wallet
+- [**Dojo Engine tooling**](https://www.dojoengine.org/en/) (Sozo, Katana, Torii, NPM package: Create Burner) for the Game's contract development/test/deployment and Front connection
+- [**Argent Mobile Wallet**](https://support.argent.xyz/hc/en-us/categories/10441480518557-Argent-Starknet-Mobile) as the primary user wallet
 
 #### Deployed Contracts (Goerli Testnet)
 
