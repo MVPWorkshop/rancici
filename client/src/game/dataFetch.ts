@@ -29,12 +29,9 @@ export const run = async (stateManager, matchId) => {
     }
   }, 310);
 
-  // const steps = [];
-  // for (let stepIdx = 0; stepIdx < STEP_COUNT; ++stepIdx) {
-  //   steps.push(randStep());
-  // }
+  console.log({ Q: stateManager.state.statsState });
 
-  const steps = _mockData.build();
+  const steps = _mockData.build(stateManager.state.stats.p1);
 
   console.log({ steps });
   const battleState = {

@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Block, BlockShape, BoardShape, EmptyCell, SHAPES } from '../types';
-import { useInterval } from './useInterval';
-import soundEffectFile from "../assets/click-button-140881.mp3"; 
+import { useCallback, useEffect, useState } from "react";
+import { Block, BlockShape, BoardShape, EmptyCell, SHAPES } from "../types";
+import { useInterval } from "./useInterval";
+import soundEffectFile from "../assets/click-button-140881.mp3";
 import commitEffectFile from "../assets/commit-sound.mp3";
 import rotateEffectFile from "../assets/218453-ICE_Skate_scrape_one_leg_rotate_10.wav";
 import {
@@ -11,10 +11,10 @@ import {
   getEmptyBoard,
   getBoardWithCharBlocks,
   getRandomUniqueBlocks,
-} from './useBoard';
-import {chosenBlockEmitter} from "../components/AvailableBlocks";
-import {cellHoverEmitter} from "../components/Board";
-import {stopPlayingClickEmitter} from "../components/Battle";
+} from "./useBoard";
+import { chosenBlockEmitter } from "../components/AvailableBlocks";
+import { cellHoverEmitter } from "../components/Board";
+import { stopPlayingClickEmitter } from "../components/Battle";
 
 enum TickSpeed {
   Normal = 800,
@@ -32,19 +32,32 @@ export function useGameLogic() {
   const [isCommitting, setIsCommitting] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [tickSpeed, setTickSpeed] = useState<TickSpeed | null>(null);
-  const initialStats = [{ charBlock: Block.Char1, health: 100, armor: 0, attack: 50, blockId: 11 },
-  { charBlock: Block.Char2, health: 100, armor: 0, attack: 50, blockId: 12 },
-  { charBlock: Block.Char3, health: 100, armor: 0, attack: 50, blockId: 13 },
-  { charBlock: Block.Char4, health: 100, armor: 0, attack: 50, blockId: 14 },
-  { charBlock: Block.Char5, health: 100, armor: 0, attack: 50, blockId: 15 }];
+  const initialStats = [
+    { charBlock: Block.Char1, health: 100, armor: 0, attack: 50, blockId: 11 },
+    { charBlock: Block.Char2, health: 100, armor: 0, attack: 50, blockId: 12 },
+    { charBlock: Block.Char3, health: 100, armor: 0, attack: 50, blockId: 13 },
+    { charBlock: Block.Char4, health: 100, armor: 0, attack: 50, blockId: 14 },
+    { charBlock: Block.Char5, health: 100, armor: 0, attack: 50, blockId: 15 },
+  ];
   const newUpcomingBlocks = structuredClone(upcomingBlocks) as Block[];
 
   const [stats, setStats] = useState(initialStats);
   const [formation, setFormation] = useState<number[]>([]);
-  const [charPositionsInFormation, setCharPositionsInFormation] = useState<number[]>([]);
+  const [charPositionsInFormation, setCharPositionsInFormation] = useState<
+    number[]
+  >([]);
 
   const [
-    { board, droppingRow, droppingColumn, droppingBlock, droppingShape, collisions, numberOfBlocksOnBoard, chosenBlock },
+    {
+      board,
+      droppingRow,
+      droppingColumn,
+      droppingBlock,
+      droppingShape,
+      collisions,
+      numberOfBlocksOnBoard,
+      chosenBlock,
+    },
     dispatchBoardState,
   ] = useBoard();
 
@@ -56,18 +69,18 @@ export function useGameLogic() {
       setIsCommitting(false);
       setIsPlaying(true);
       setTickSpeed(TickSpeed.Normal);
-      dispatchBoardState({ type: 'start', chosenBlock: startingBlocks[0]});
+      dispatchBoardState({ type: "start", chosenBlock: startingBlocks[0] });
       setStats(initialStats);
     };
-  
+
     startGame();
   }, []);
-  
+
   const commitPosition = useCallback(() => {
     // console.log("you entered commitPosition");
     if (hasCollisions(board, droppingShape, droppingRow, droppingColumn)) {
       return;
-    } 
+    }
     const newBoard = structuredClone(board) as BoardShape;
 
     // console.log("drop block: "+ droppingBlock);
@@ -82,16 +95,18 @@ export function useGameLogic() {
       droppingRow,
       droppingColumn
     );
-    const blocksWithoutCommittedOne = upcomingBlocks.filter(block => block !== chosenBlock);
+    const blocksWithoutCommittedOne = upcomingBlocks.filter(
+      (block) => block !== chosenBlock
+    );
     setUpcomingBlocks(blocksWithoutCommittedOne);
     const newChosenBlock = blocksWithoutCommittedOne[0];
 
     dispatchBoardState({
-      type: 'commit',
+      type: "commit",
       newBoard: newBoard,
-      chosenBlock: newChosenBlock
+      chosenBlock: newChosenBlock,
     });
-   
+
     commitAudio.play();
     const boardFormation = getFormation(renderedBoard);
     setFormation(boardFormation);
@@ -107,7 +122,7 @@ export function useGameLogic() {
     droppingShape,
     upcomingBlocks,
     numberOfBlocksOnBoard,
-    chosenBlock
+    chosenBlock,
   ]);
 
   useEffect(() => {
@@ -118,57 +133,63 @@ export function useGameLogic() {
     let isPressingLeft = false;
     let isPressingRight = false;
 
-   
-        // console.log("upcoming blocks: "+ upcomingBlocks);
-        // console.log("newupcoming blocks: "+ newUpcomingBlocks);
-        let newBlock: Block;
-        let indexofChosenBlock = chosenBlock !== Block.None ? upcomingBlocks.indexOf(chosenBlock) : 0;
+    // console.log("upcoming blocks: "+ upcomingBlocks);
+    // console.log("newupcoming blocks: "+ newUpcomingBlocks);
+    let newBlock: Block;
+    let indexofChosenBlock =
+      chosenBlock !== Block.None ? upcomingBlocks.indexOf(chosenBlock) : 0;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) {
         return;
       }
 
-      if (event.key === 'ArrowDown') {
+      if (event.key === "ArrowDown") {
         // setTickSpeed(TickSpeed.Fast);
       }
 
-      if (event.key === 'ArrowUp') {
+      if (event.key === "w") {
         rotateAudio.play();
         dispatchBoardState({
-          type: 'move',
+          type: "move",
           isRotating: true,
         });
       }
 
-      if (event.key === 'ArrowLeft') {
+      if (event.key === "a") {
         audio.play();
         isPressingLeft = true;
-        const newIndex = indexofChosenBlock === 0 ? newUpcomingBlocks.length - 1 : indexofChosenBlock - 1;
+        const newIndex =
+          indexofChosenBlock === 0
+            ? newUpcomingBlocks.length - 1
+            : indexofChosenBlock - 1;
 
         newBlock = upcomingBlocks[newIndex];
 
-        dispatchBoardState({type: 'drop', chosenBlock: newBlock});
+        dispatchBoardState({ type: "drop", chosenBlock: newBlock });
       }
 
-      if (event.key === 'ArrowRight') {
+      if (event.key === "d") {
         audio.play();
         isPressingRight = true;
-        const newIndex = indexofChosenBlock === newUpcomingBlocks.length - 1 ? 0 : indexofChosenBlock + 1;
+        const newIndex =
+          indexofChosenBlock === newUpcomingBlocks.length - 1
+            ? 0
+            : indexofChosenBlock + 1;
 
         newBlock = upcomingBlocks[newIndex];
 
-        dispatchBoardState({type: 'drop', chosenBlock: newBlock});
+        dispatchBoardState({ type: "drop", chosenBlock: newBlock });
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [dispatchBoardState, upcomingBlocks, chosenBlock]);
 
-  const renderedBoard = structuredClone(board) as BoardShape; 
+  const renderedBoard = structuredClone(board) as BoardShape;
   if (isPlaying) {
     addShapeToBoard(
       renderedBoard,
@@ -179,19 +200,29 @@ export function useGameLogic() {
     );
   }
 
-//hook za lkik na AVAILABLE BLOCK  : OVAJ HOOK MI NVISE NE TREBA PROVERI
+  //hook za lkik na AVAILABLE BLOCK  : OVAJ HOOK MI NVISE NE TREBA PROVERI
   useEffect(() => {
-    const handleBlockSelection = ({ blockId, blockShape }: { blockId: number; blockShape: Block }) => {
+    const handleBlockSelection = ({
+      blockId,
+      blockShape,
+    }: {
+      blockId: number;
+      blockShape: Block;
+    }) => {
       // console.log('Selected Block ID:', blockId);
       // console.log('Selected Block:', blockShape);
 
-      dispatchBoardState({type: 'setChosenBlock', chosenBlock: blockShape, chosenBlockId: blockId} );
+      dispatchBoardState({
+        type: "setChosenBlock",
+        chosenBlock: blockShape,
+        chosenBlockId: blockId,
+      });
     };
 
-    chosenBlockEmitter.on('blockSelected', handleBlockSelection);
+    chosenBlockEmitter.on("blockSelected", handleBlockSelection);
 
     return () => {
-        chosenBlockEmitter.off('blockSelected', handleBlockSelection);
+      chosenBlockEmitter.off("blockSelected", handleBlockSelection);
     };
   }, [
     board,
@@ -201,21 +232,31 @@ export function useGameLogic() {
     droppingRow,
     droppingShape,
     upcomingBlocks,
-    chosenBlock
-  ]); 
-  
+    chosenBlock,
+  ]);
+
   //hook za HOVER
   useEffect(() => {
-    const handleCellHover = ({ rowIndex, colIndex }: { rowIndex: number; colIndex: number }) => {
+    const handleCellHover = ({
+      rowIndex,
+      colIndex,
+    }: {
+      rowIndex: number;
+      colIndex: number;
+    }) => {
       // console.log('Hovered Cell Row:', rowIndex + ' Hovered Cell Column:', colIndex);
 
-    dispatchBoardState({ type: 'drop', hoveredColumnIndex: colIndex, hoveredRowIndex: rowIndex});
+      dispatchBoardState({
+        type: "drop",
+        hoveredColumnIndex: colIndex,
+        hoveredRowIndex: rowIndex,
+      });
     };
 
-    cellHoverEmitter.on('cellHover', handleCellHover);
+    cellHoverEmitter.on("cellHover", handleCellHover);
 
     return () => {
-      cellHoverEmitter.off('cellHover', handleCellHover);
+      cellHoverEmitter.off("cellHover", handleCellHover);
     };
   }, [
     board,
@@ -225,21 +266,27 @@ export function useGameLogic() {
     droppingRow,
     droppingShape,
     upcomingBlocks,
-    chosenBlock
-]); 
+    chosenBlock,
+  ]);
 
-//hook za CELL CLICK
-useEffect(() => {
-    const handleCellClick = ({ rowIndex, colIndex }: { rowIndex: number; colIndex: number }) => {
+  //hook za CELL CLICK
+  useEffect(() => {
+    const handleCellClick = ({
+      rowIndex,
+      colIndex,
+    }: {
+      rowIndex: number;
+      colIndex: number;
+    }) => {
       // console.log('Clicked Cell Row:', rowIndex + ' Clicked Cell Column:', colIndex);
 
       commitPosition();
     };
 
-    cellHoverEmitter.on('cellClick', handleCellClick);
+    cellHoverEmitter.on("cellClick", handleCellClick);
 
     return () => {
-      cellHoverEmitter.off('cellClick', handleCellClick);
+      cellHoverEmitter.off("cellClick", handleCellClick);
     };
   }, [
     board,
@@ -249,39 +296,39 @@ useEffect(() => {
     droppingRow,
     droppingShape,
     upcomingBlocks,
-    chosenBlock
-]);
+    chosenBlock,
+  ]);
 
-// hook za kraj igre
-useEffect(() => {
-  const handleStopPLaying = () =>{
-    console.log('stop playing');
-    // const boardFormation = getFormation(renderedBoard);
-    // setFormation(boardFormation);
-    // setCharPositionsInFormation(getCharPositions(boardFormation));
-    setIsPlaying(false);
-    dispatchBoardState({type: 'stop'});
-  }
-  stopPlayingClickEmitter.on('stopPlay', handleStopPLaying);
+  // hook za kraj igre
+  useEffect(() => {
+    const handleStopPLaying = () => {
+      console.log("stop playing");
+      // const boardFormation = getFormation(renderedBoard);
+      // setFormation(boardFormation);
+      // setCharPositionsInFormation(getCharPositions(boardFormation));
+      setIsPlaying(false);
+      dispatchBoardState({ type: "stop" });
+    };
+    stopPlayingClickEmitter.on("stopPlay", handleStopPLaying);
 
     return () => {
-      stopPlayingClickEmitter.off('cellClick', handleStopPLaying);
+      stopPlayingClickEmitter.off("cellClick", handleStopPLaying);
     };
-  }, [isPlaying]); 
+  }, [isPlaying]);
 
   //hook za stats
   useEffect(() => {
     const handleBoardChange = () => {
-      if(isCommitting){
+      if (isCommitting) {
         const newStats = getNewStats(initialStats, board);
-      setStats(newStats);
+        setStats(newStats);
       }
     };
 
     handleBoardChange();
 
     return () => {
-        setIsCommitting(false);
+      setIsCommitting(false);
     };
   }, [isCommitting]);
 
@@ -292,17 +339,17 @@ useEffect(() => {
     chosenBlock,
     collisions,
     formation,
-    charPositionsInFormation
+    charPositionsInFormation,
   };
 }
 
-function getNewStats(initialStats, board: BoardShape) : any{
+function getNewStats(initialStats, board: BoardShape): any {
   let finalCharacterArray = initialStats;
   let arrayOfBoard = transformBoardToArray(board);
 
   for (let i = 11; i < 16; i++) {
     let charPosition = arrayOfBoard.indexOf(i);
-    let character = finalCharacterArray.find(stat => stat.blockId === i); 
+    let character = finalCharacterArray.find((stat) => stat.blockId === i);
     let leftOfCharacter = arrayOfBoard[charPosition - 1];
     let rightOfCharacter = arrayOfBoard[charPosition + 1];
     let upOfCharacter = arrayOfBoard[charPosition - 7];
@@ -349,7 +396,6 @@ function getNewStats(initialStats, board: BoardShape) : any{
 
   return finalCharacterArray;
 }
-
 
 function transformBoardToArray(board: BoardShape): number[] {
   const transformedArray: number[] = [];
@@ -406,7 +452,7 @@ function transformBoardToArray(board: BoardShape): number[] {
   return transformedArray;
 }
 
-export function getFormation(board: BoardShape): number[]{
+export function getFormation(board: BoardShape): number[] {
   const transformedArray: number[] = [];
 
   for (let i = 0; i < board.length; i++) {
@@ -453,17 +499,16 @@ export function getFormation(board: BoardShape): number[]{
   return transformedArray;
 }
 
-export function getCharPositions(array: number[]): number[]{
+export function getCharPositions(array: number[]): number[] {
   const positions: number[] = [];
-    
-    for (let i = 0; i < array.length; i++) {
-        if (array[i] === 1) {
-            positions.push(i);
-        }
-    }
-    return positions;
-}
 
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] === 1) {
+      positions.push(i);
+    }
+  }
+  return positions;
+}
 
 function addShapeToBoard(
   board: BoardShape,
@@ -472,23 +517,25 @@ function addShapeToBoard(
   droppingRow: number,
   droppingColumn: number
 ) {
-    // if (droppingBlock == Block.None || droppingShape == SHAPES.None.shape || droppingRow == -1 || droppingColumn == -1 ) {
-    //     return;
-    //   }
+  // if (droppingBlock == Block.None || droppingShape == SHAPES.None.shape || droppingRow == -1 || droppingColumn == -1 ) {
+  //     return;
+  //   }
   droppingShape
-    .filter((row) => row.some((isSet) => isSet)) 
-    .forEach((row: boolean[], rowIndex: number) => { 
+    .filter((row) => row.some((isSet) => isSet))
+    .forEach((row: boolean[], rowIndex: number) => {
       row.forEach((isSet: boolean, colIndex: number) => {
         if (isSet) {
-            const newRow = droppingRow + rowIndex;
+          const newRow = droppingRow + rowIndex;
           const newCol = droppingColumn + colIndex;
           if (
-            newRow < 0 || newRow >= board.length ||
-            newCol < 0 || newCol >= board[0].length 
+            newRow < 0 ||
+            newRow >= board.length ||
+            newCol < 0 ||
+            newCol >= board[0].length
           ) {
-            return; 
+            return;
           }
-          board[newRow][newCol] = droppingBlock; 
+          board[newRow][newCol] = droppingBlock;
         }
       });
     });

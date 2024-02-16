@@ -1,4 +1,4 @@
-const STEP_COUNT = 20;
+const STEP_COUNT = 15;
 
 export const steps = [
   {
@@ -11,11 +11,11 @@ export const steps = [
     },
 
     P2: {
-      Ch1: { stats: { health: 150 } },
-      Ch2: { stats: { health: 150 } },
-      Ch3: { stats: { health: 150 } },
-      Ch4: { stats: { health: 150 } },
-      Ch5: { stats: { health: 150 } },
+      Ch1: { stats: { health: 90 } },
+      Ch2: { stats: { health: 120 } },
+      Ch3: { stats: { health: 80 } },
+      Ch4: { stats: { health: 130 } },
+      Ch5: { stats: { health: 70 } },
     },
     attacker: { pIdx: 2, chIdx: 1 },
     target: { pIdx: 1, chIdx: 1 },
@@ -45,7 +45,16 @@ const idxs = [1, 2, 3, 4, 5, 1, 2, 3, 4, 5];
 
 const attack = { P1: 20, P2: 10 };
 
-export const build = () => {
+export const build = (stats) => {
+  console.log({ stats });
+  steps[0].P1 = {
+    Ch1: { stats: { health: stats[0].health } },
+    Ch2: { stats: { health: stats[1].health } },
+    Ch3: { stats: { health: stats[2].health } },
+    Ch4: { stats: { health: stats[3].health } },
+    Ch5: { stats: { health: stats[4].health } },
+  };
+
   for (let i = 1; i < STEP_COUNT; ++i) {
     const prevStep = steps[i - 1];
     const step = {

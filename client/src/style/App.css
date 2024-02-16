@@ -88,7 +88,7 @@
 .Navbar .Logo .Text {
   font-size: 30px;
   line-height: var(--navbar-element-height);
-  padding-left: 3px;
+  padding-left: 10px;
 }
 .Navbar .RightSideWrapper {
   width: 500px;
@@ -165,7 +165,7 @@
     ". stats .";
   /* grid-template-columns: repeat(3, 1fr); */
   grid-template-columns: 300px 490px auto;
-  grid-template-rows: 600px auto; 
+  grid-template-rows: 600px auto;
   height: max-content;
 }
 h1 {
@@ -173,7 +173,7 @@ h1 {
   grid-area: title;
 }
 
-.legend{
+.legend {
   grid-area: legend;
   align-self: center;
   display: flex;
@@ -182,21 +182,21 @@ h1 {
   justify-self: center;
 }
 
-.legend-row{
+.legend-row {
   display: grid;
-    grid-template-areas:
-      "legend-pic  legend-text"
-      "legend-pic  legend-text"
-      "legend-pic  legend-text";
-    grid-template-columns:  auto auto;
-    grid-template-rows: auto auto;
-    gap: 1em;
+  grid-template-areas:
+    "legend-pic  legend-text"
+    "legend-pic  legend-text"
+    "legend-pic  legend-text";
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  gap: 1em;
 }
 
-.legend-text{
-  font-size: 14px; 
-grid-area: legend-text;
-justify-self: start;
+.legend-text {
+  font-size: 14px;
+  grid-area: legend-text;
+  justify-self: start;
 }
 
 .char-stats {
@@ -249,7 +249,7 @@ justify-self: start;
 }
 
 .red-pic {
-  background-color:  rgba(84, 10, 170, 0.6);
+  background-color: rgba(84, 10, 170, 0.6);
   width: 15px;
   height: 15px;
   grid-area: legend-pic;
@@ -264,8 +264,9 @@ justify-self: start;
   justify-self: center;
 }
 
-.btn-container{
-align-self: flex-end;}
+.btn-container {
+  align-self: flex-end;
+}
 .row {
   display: flex;
 }
@@ -764,6 +765,10 @@ align-self: flex-end;}
   padding: 10px 20px;
 }
 
+.start-battle-btn {
+  width: 200px;
+}
+
 .Countdown {
   display: flex;
   justify-content: space-evenly;
@@ -781,4 +786,22 @@ align-self: flex-end;}
 
 .TeamInfoWrapper {
   margin-top: 140px;
+}
+
+.DisplayingInfo {
+  position: absolute;
+  top: 31%;
+  left: 60%;
+  width: 300px;
+  height: 200px;
+  background-color: rgba(0, 0, 0, 0.29);
+  padding: 33px;
+  text-align: center;
+  padding-top: 100px;
+  font-size: 20px;
+  line-height: 30px;
+}
+
+.DisplayingInfo div {
+  height: 70px;
 }

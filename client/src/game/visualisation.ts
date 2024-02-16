@@ -24,6 +24,13 @@ const updateActive = (newActive) => {
   prefixes.targetCard = targetCard.className + " ";
 };
 
+const allBecomeInactive = () => {
+  for (let i = 1; i < 6; ++i) {
+    document.getElementById(`CharacterCard-P-1-Ch-${i}`).className = "Ch";
+    document.getElementById(`CharacterCard-P-2-Ch-${i}`).className = "Ch";
+  }
+};
+
 const updateClassNames = (newClassNames) => {
   if (newClassNames.attacker != null) {
     attacker.className = prefixes.attacker + newClassNames.attacker;
@@ -92,6 +99,8 @@ export const run = async (stateManager) => {
       console.log("--->", battleState.step);
       battleState.attacker = battleState.step.attacker;
       battleState.target = battleState.step.target;
+
+      allBecomeInactive();
 
       updateActive(getActiveChars(battleState.steps[nextStepIdx]));
 

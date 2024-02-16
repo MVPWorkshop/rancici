@@ -22,7 +22,7 @@ const App = () => {
       address:
         "0x13c6407451a8ad89745906ce386e23a13631eff01b09f94ff79661e283776e12",
     },
-    page: "PreBattle", // "Login" | "PlayerMatching" | "PreBattle" | "Battle"
+    page: "Login", // "Login" | "PlayerMatching" | "PreBattle" | "Battle"
     pageState: {},
   });
   const updateState = (newState) => {
