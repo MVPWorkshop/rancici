@@ -12,7 +12,8 @@ const Navbar = ({ stateManager }) => {
       <div className="RightSideWrapper">
         <div className="Account">
           <div className="Argent">
-            <img src="./argent-logo.png"></img>
+            {/* <img src="./argent-logo.png"></img> */}
+            <div className="Img"></div>
             <div className="Address">
               {formatAddress(stateManager.state.argentWallet.address)}
             </div>
@@ -21,15 +22,16 @@ const Navbar = ({ stateManager }) => {
 
         <div className="Account">
           <div className="Dojo">
-            <img src="./dojo-logo.png"></img>
+            {/* <img src="./dojo-logo.png"></img> */}
+            <div className="Img"></div>
             <div className="Address">
-              {formatAddress(stateManager.state.argentWallet.address)}
+              {formatAddress(stateManager.state.burnerWallet.address)}
             </div>
           </div>
         </div>
 
         <button onClick={async () => disconnectWallet(stateManager)}>
-          Disconnect Wallet
+          Disconnect
         </button>
       </div>
     </div>
@@ -49,10 +51,6 @@ const disconnectWallet = async (stateManager) => {
 };
 
 const formatAddress = (address: string) => {
-  //mock for now
-  return `0x${Math.floor(1000 * Math.random())}...${Math.floor(
-    1000 * Math.random()
-  )}`;
   return `${address.slice(0, 5)}...${address.slice(
     address.length - 3,
     address.length
