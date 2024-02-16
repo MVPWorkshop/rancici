@@ -12,7 +12,7 @@ Players enter matches in which they get:
   - Where each character has: Health, Armor, and Attack statistic
 - Different shapes (10) that have:
   - One of 3 effects (+30 Health, +20 Attack or +15 Armor) on character statistics
-    - (If the shape occupies one of his adjacent cells)
+    - (If the shape occupies one of character's adjacent cells)
   - These shapes can be rotated, but cannot overlap
 
 **Goal of the Game** is to find the optimal positioning of the shapes, given the character placement, and the opponent they have encountered.
