@@ -83,4 +83,6 @@ For Cli battle commands and controls look at [Battle Steps Commands](./contracts
 
 ## Further Directions
 
-Will include: Multiplayer mode, Multi-round matches, Community-driven tournaments and leagues, and much more...
+We are exploring couple of main directions for the Rancici Universe, some being:
+
+- Multiplayer mode, Multi-round matches, Community-driven tournaments/leagues, ...
